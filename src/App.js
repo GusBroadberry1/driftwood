@@ -101,6 +101,14 @@ const groupOptions = [
   { value: "mixed_group", label: "Mixed Group", icon: "🎒" },
 ];
 
+const durationOptions = [
+  { value: "3", label: "Weekend Getaway", desc: "2–4 days", icon: "⚡" },
+  { value: "7", label: "One Week", desc: "5–8 days", icon: "📅" },
+  { value: "12", label: "Two Weeks", desc: "10–14 days", icon: "🗺" },
+  { value: "21", label: "Extended Journey", desc: "3–4 weeks", icon: "✈️" },
+  { value: "90", label: "Career Break", desc: "2–3+ months", icon: "🌍" },
+];
+
 const interestOptions = [
   { label: "Food & Markets", icon: "🍜" },
   { label: "Nature & Trekking", icon: "🏔" },
