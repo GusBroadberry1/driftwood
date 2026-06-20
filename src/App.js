@@ -468,16 +468,12 @@ Write like a well-travelled friend. Specific, practical, direct. Around 1000 wor
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "PASTE_YOUR_NEW_KEY_HERE",
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 1000,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
+          const res = await fetch("/api/generate", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ prompt }),
+});
+
       const data = await res.json();
       const text = data.content?.map((b) => b.text || "").join("\n") || "";
       if (!text) throw new Error("No response received");
