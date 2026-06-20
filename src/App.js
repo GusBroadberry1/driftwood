@@ -342,7 +342,7 @@ const BudgetVisualiser = ({ budget, duration }) => {
               style={{ transform: "rotate(-90deg)", transformOrigin: `${cx}px ${cy}px` }}
             />
           ))}
-          <text x={cx} y={cy - 8} textAnchor="middle" style={{ fontSize: "14px", fontFamily: font.body, fontWeight: 700, fill: C.text }}>${total.toLocaleString()}</text>
+          <text x={cx} y={cy - 8} textAnchor="middle" style={{ fontSize: "14px", fontFamily: font.body, fontWeight: 700, fill: C.text }}>£{total.toLocaleString()}</text>
           <text x={cx} y={cy + 8} textAnchor="middle" style={{ fontSize: "10px", fontFamily: font.body, fill: C.muted }}>estimated</text>
           <text x={cx} y={cy + 20} textAnchor="middle" style={{ fontSize: "10px", fontFamily: font.body, fill: C.muted }}>total</text>
         </svg>
@@ -354,8 +354,8 @@ const BudgetVisualiser = ({ budget, duration }) => {
                 <span style={{ fontSize: "13px", fontFamily: font.body, color: C.textMid }}>{s.label}</span>
               </div>
               <div style={{ textAlign: "right" }}>
-                <span style={{ fontSize: "13px", fontWeight: 600, fontFamily: font.body, color: C.text }}>${Math.round(budget * s.pct)}</span>
-                <span style={{ fontSize: "11px", color: C.muted, fontFamily: font.body }}>/day</span>
+                <span style={{ fontSize: "13px", fontWeight: 600, fontFamily: font.body, color: C.text }}>£{Math.round(budget * s.pct)}</span>
+               <span style={{ fontSize: "11px", color: C.muted, fontFamily: font.body }}>/day</span>
               </div>
             </div>
           ))}
@@ -363,7 +363,7 @@ const BudgetVisualiser = ({ budget, duration }) => {
       </div>
       <div style={{ marginTop: "16px", background: C.driftLight, borderRadius: "10px", padding: "13px 16px", border: `1px solid ${C.borderDark}` }}>
         <div style={{ fontSize: "13px", fontFamily: font.body, color: C.drift, fontWeight: 600 }}>
-          💡 Total trip estimate: ${total.toLocaleString()} — ${Math.round(total * 1.12).toLocaleString()}
+          💡 Total trip estimate: £{total.toLocaleString()} — £{Math.round(total * 1.12).toLocaleString()}
         </div>
         <div style={{ fontSize: "12px", fontFamily: font.body, color: C.muted, marginTop: "3px" }}>
           Includes a 12% variance buffer for unexpected costs
@@ -431,7 +431,7 @@ TRAVELLER PROFILE:
 - Travel Personality: ${p.name} — ${p.desc}
 - Destination: ${form.destination}
 - Duration: ${form.duration} days
-- Daily Budget: $${form.budget}/day USD
+- Daily Budget: £${form.budget}/day GBP
 - Travel Dates: ${form.startDate || "Flexible"}
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
 - Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
@@ -567,10 +567,15 @@ setResult(text || "Something went wrong generating this one — please try again
         <Label hint="Country, region, or city — as specific as you like">Destination</Label>
         <TextInput placeholder="e.g. Southern Thailand, Bali, Colombia" value={form.destination} onChange={(v) => setField("destination", v)} />
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "22px" }}>
-        <div><Label>Duration (days)</Label><TextInput type="number" placeholder="e.g. 10" value={form.duration} onChange={(v) => setField("duration", v)} /></div>
-        <div><Label>Daily Budget (USD $)</Label><TextInput type="number" placeholder="e.g. 40" value={form.budget} onChange={(v) => setField("budget", v)} /></div>
-      </div>
+      <div style={{ marginBottom: "22px" }}>
+  <Label>How long is the trip?</Label>
+  <SelectCard options={durationOptions} value={form.duration} onChange={(v) => setField("duration", v)} cols={2} />
+</div>
+<div style={{ marginBottom: "22px" }}>
+  <Label>Daily Budget (£)</Label>
+  <TextInput type="number" placeholder="e.g. 40" value={form.budget} onChange={(v) => setField("budget", v)} />
+</div>
+
       <div style={{ marginBottom: "22px" }}>
         <Label hint="Used to flag weather, crowds and seasonal alerts">Approximate start date</Label>
         <TextInput type="date" value={form.startDate} onChange={(v) => setField("startDate", v)} />
