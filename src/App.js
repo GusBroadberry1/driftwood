@@ -465,14 +465,12 @@ Entry requirements for UK, US, EU passport holders. Costs and method.
 Write like a well-travelled friend. Specific, practical, direct. Around 1000 words total.`;
 
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+            const res = await fetch("/api/generate", {
         method: "POST",
-        headers: {
-          const res = await fetch("/api/generate", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ prompt }),
-});
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
 
       const data = await res.json();
       const text = data.content?.map((b) => b.text || "").join("\n") || "";
