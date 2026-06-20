@@ -473,9 +473,10 @@ Write like a well-travelled friend. Specific, practical, direct. Around 1000 wor
 
 
       const data = await res.json();
-      const text = data.content?.map((b) => b.text || "").join("\n") || "";
-      if (!text) throw new Error("No response received");
-      setResult(text);
+      console.log("RAW DATA:", data);
+const text = data.content?.map((b) => b.text || "").join("\n") || "";
+setResult(text || JSON.stringify(data));
+
     } catch (err) {
       setError("Error: " + err.message);
     } finally {
