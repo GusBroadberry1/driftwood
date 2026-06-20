@@ -634,7 +634,7 @@ setResult(text || "Something went wrong generating this one — please try again
           <div style={{ fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600, opacity: 0.7, marginBottom: "8px", fontFamily: font.body }}>Your Driftwood Itinerary</div>
           <h2 style={{ fontFamily: font.display, fontSize: "30px", margin: "0 0 4px", fontWeight: 600, lineHeight: 1.1 }}>{form.destination}</h2>
           <div style={{ fontSize: "14px", opacity: 0.8, fontFamily: font.body, marginBottom: "20px" }}>
-            {form.duration} days · ${form.budget}/day · {p.emoji} {p.name}
+            {form.duration} days · £{form.budget}/day · {p.emoji} {p.name}
           </div>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             {[
