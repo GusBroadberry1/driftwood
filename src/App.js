@@ -473,9 +473,9 @@ Write like a well-travelled friend. Specific, practical, direct. Around 1000 wor
 
 
       const data = await res.json();
-      console.log("RAW DATA:", data);
-const text = data.content?.map((b) => b.text || "").join("\n") || "";
-setResult(text || JSON.stringify(data));
+      const text = data.content?.map((b) => b.text || "").join("\n") || "";
+setResult(text || "Something went wrong generating this one — please try again.");
+
 
     } catch (err) {
       setError("Error: " + err.message);
