@@ -449,8 +449,10 @@ Logical geographic flow (A → B → C) tailored to their pace and personality.
 ## Accommodation
 Personality-matched picks. 2 specific hostels/stays per main location with nightly cost, neighbourhood context, and whether to book ahead or walk in.
 
-## Day-by-Day Breakdown
-Each day: Morning / Afternoon / Evening. Transit notes and one insider tip per day.
+${Number(form.duration) > 21 ? `## Trip Breakdown
+This is a longer trip (${form.duration} days). Structure as phases, roughly one phase per week or per location — not individual days. For each phase: location/region, vibe and pace summary, 3-4 key activities matched to the traveller's interests, one standout restaurant recommendation, and a transit note for the next phase.` : `## Day-by-Day Breakdown
+Each day: Morning / Afternoon / Evening, matched to the traveller's interests. Include one restaurant recommendation per day woven naturally into the plan, plus transit notes and one insider tip.`}
+
 
 ## Season & Timing
 Weather and crowd expectations for their dates. Any alerts or advantages.
