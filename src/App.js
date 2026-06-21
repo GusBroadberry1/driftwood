@@ -475,11 +475,16 @@ Entry requirements for UK, US, EU passport holders. Costs and method.
 Write like a well-travelled friend. Specific, practical, direct. Around 1000 words total.`;
 
     try {
-            const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      });
+            const controller = new AbortController();
+const timeoutId = setTimeout(() => controller.abort(), 90000);
+const res = await fetch("/api/generate", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ prompt }),
+  signal: controller.signal,
+});
+clearTimeout(timeoutId);
+
 
 
       const data = await res.json();
