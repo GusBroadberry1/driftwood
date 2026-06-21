@@ -375,12 +375,15 @@ const BudgetVisualiser = ({ budget, duration }) => {
 const renderMarkdown = (text) => {
   const lines = text.split("\n");
   return lines.map((line, i) => {
-    const parts = line.split(/(\*\*[^*]+\*\*)/g).map((part, j) => {
-      if (part.startsWith("**") && part.endsWith("**")) {
-        return <strong key={j} style={{ color: C.drift, fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
-      }
-      return part;
-    });
+    const parts = line.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, j) => {
+  if (part.startsWith("**") && part.endsWith("**")) {
+    return <strong key={j} style={{ color: C.drift, fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
+  }
+  if (part.startsWith("*") && part.endsWith("*")) {
+    return <strong key={j} style={{ color: C.drift, fontWeight: 700 }}>{part.slice(1, -1)}</strong>;
+  }
+  return part;
+});
 
     if (line.trim().startsWith("- ")) {
       return (
