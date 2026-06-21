@@ -372,6 +372,40 @@ const BudgetVisualiser = ({ budget, duration }) => {
     </div>
   );
 };
+const renderMarkdown = (text) => {
+  const lines = text.split("\n");
+  return lines.map((line, i) => {
+    const parts = line.split(/(\*\*[^*]+\*\*)/g).map((part, j) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return <strong key={j} style={{ color: C.drift, fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
+
+    if (line.trim().startsWith("- ")) {
+      return (
+        <div key={i} style={{ display: "flex", gap: "8px", marginBottom: "6px", paddingLeft: "4px" }}>
+          <span style={{ color: C.drift }}>•</span>
+          <span>{parts.map(p => typeof p === "string" ? p.replace(/^-\s*/, "") : p)}</span>
+        </div>
+      );
+    }
+
+    if (line.trim().startsWith("###")) {
+      return <div key={i} style={{ fontWeight: 700, fontSize: "15px", color: C.drift, marginTop: "14px", marginBottom: "6px" }}>{line.replace(/^###\s*/, "")}</div>;
+    }
+
+    if (line.trim() === "---") {
+      return <div key={i} style={{ height: "1px", background: C.border, margin: "12px 0" }} />;
+    }
+
+    if (line.trim() === "") {
+      return <div key={i} style={{ height: "8px" }} />;
+    }
+
+    return <div key={i} style={{ marginBottom: "4px" }}>{parts}</div>;
+  });
+};
 
 const parseOutput = (text) => {
   const sectionMap = {
@@ -663,7 +697,7 @@ setResult(text || "Something went wrong generating this one — please try again
         <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "20px" }}>
           {sections.map((s, i) => (
             <OutputSection key={s.id} emoji={s.emoji} title={s.title} last={i === sections.length - 1}>
-              <div style={{ fontSize: "14px", lineHeight: "1.85", color: C.textMid, fontFamily: font.body, whiteSpace: "pre-wrap" }}>{s.body}</div>
+              <div style={{ fontSize: "14px", lineHeight: "1.85", color: C.textMid, fontFamily: font.body, }}>{renderMarkdown(s.body)}</div>
             </OutputSection>
           ))}
         </div>
