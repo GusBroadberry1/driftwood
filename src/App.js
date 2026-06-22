@@ -805,11 +805,13 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
         <button onClick={resetAll} style={{ width: "100%", background: "transparent", border: `1.5px solid ${C.drift}`, color: C.drift, borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
           ← Plan Another Trip
         </button>
-      )}
+            )}
     </div>
   );
+};
 
   return (
+
     <div style={{ minHeight: "100vh", background: C.bg }}>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
       <div style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, boxShadow: "0 1px 8px rgba(0,0,0,0.04)" }}>
