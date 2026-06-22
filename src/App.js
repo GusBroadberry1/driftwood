@@ -461,12 +461,22 @@ const [error, setError] = useState(null);
   const setField = (field, val) => setForm((f) => ({ ...f, [field]: val }));
   const canGenerate = form.destination && form.duration && form.budget && form.accom && form.pace && form.interests.length >= 1;
 
-  const generate = async () => {
-    setLoading(true);
-    setError(null);
-    setResult(null);
-    const p = personality || { name: "The Savvy Explorer", desc: "" };
-    const prompt = `You are an expert backpacker travel planner with deep destination knowledge. Generate a rich, personalised travel itinerary.
+  const callAI = async (prompt) => {
+  const res = await fetch("/api/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt }),
+  });
+  const data = await res.json();
+  const text = data.content?.map((b) => b.text || "").join("\n") || "";
+  return text || "Something went wrong generating this part — please try again.";
+};
+
+const generatePreview = async () => {
+  setLoadingStage("preview");
+  setError(null);
+  const p = personality || { name: "The Savvy Explorer", desc: "" };
+  const prompt = `You are an expert backpacker travel planner. Generate a SHORT preview for this trip.
 
 TRAVELLER PROFILE:
 - Travel Personality: ${p.name} — ${p.desc}
@@ -477,6 +487,42 @@ TRAVELLER PROFILE:
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
 - Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
 - Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}
+- Interests: ${form.interests.join(", ")}
+- Avoid: ${form.avoids.length ? form.avoids.join(", ") : "Nothing specified"}
+
+Respond with EXACTLY these two sections:
+
+## Route Overview
+2-3 sentences on the geographic flow (A → B → C) tailored to their pace.
+
+## Day 1
+Morning / Afternoon / Evening for day one only, matched to their interests. Short bullet points, not paragraphs.
+
+Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
+
+  try {
+    const text = await callAI(prompt);
+    setPreviewResult(text);
+  } catch {
+    setError("Something went wrong. Please try again.");
+  } finally {
+    setLoadingStage(null);
+  }
+};
+
+const generateFull1 = async () => {
+  setLoadingStage("call1");
+  const p = personality || { name: "The Savvy Explorer", desc: "" };
+  const isLong = Number(form.duration) > 21;
+  const prompt = `You are an expert backpacker travel planner. Continue planning this trip in detail.
+
+TRAVELLER PROFILE:
+- Travel Personality: ${p.name}
+- Destination: ${form.destination}
+- Duration: ${form.duration} days
+- Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
+- Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
+- Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}
 - Transit Comfort: ${form.transit}/5
 - Interests: ${form.interests.join(", ")}
 - Avoid: ${form.avoids.length ? form.avoids.join(", ") : "Nothing specified"}
@@ -484,25 +530,53 @@ TRAVELLER PROFILE:
 
 Respond with EXACTLY these sections:
 
-## Route Overview
-Logical geographic flow (A → B → C) tailored to their pace and personality.
+## Top Picks
+3 standout highlights of this trip, one line each, the things they absolutely shouldn't miss.
 
 ## Accommodation
 Personality-matched picks. 2 specific hostels/stays per main location with nightly cost, neighbourhood context, and whether to book ahead or walk in.
 
-${Number(form.duration) > 21 ? `## Trip Breakdown
-This is a longer trip (${form.duration} days). Structure as phases, roughly one phase per week or per location — not individual days. For each phase: location/region, vibe and pace summary, 3-4 key activities matched to the traveller's interests, one standout restaurant recommendation, and a transit note for the next phase.` : `## Day-by-Day Breakdown
-Each day: Morning / Afternoon / Evening, matched to the traveller's interests. Include one restaurant recommendation per day woven naturally into the plan, plus transit notes and one insider tip.`}
+${isLong
+  ? `## Trip Breakdown
+This is a longer trip (${form.duration} days). Structure as phases, roughly one phase per week or per location — not individual days. For each phase: location/region, vibe summary, 3-4 key activities matched to interests, one restaurant recommendation, transit note for the next phase.`
+  : `## Day-by-Day Breakdown
+Days 2 onwards (day 1 was already covered). Each day: Morning / Afternoon / Evening as short bullet points, matched to interests. Include one restaurant recommendation per day, plus a transit note and one insider tip.`
+}
 
+Write like a well-travelled friend. Specific, practical, concise bullet points over long paragraphs. Around 1200 words total.`;
+
+  try {
+    const text = await callAI(prompt);
+    setFullResult1(text);
+  } catch {
+    setError("Something went wrong. Please try again.");
+  } finally {
+    setLoadingStage("call2");
+    generateFull2();
+  }
+};
+
+const generateFull2 = async () => {
+  const prompt = `You are an expert backpacker travel planner. Provide the practical essentials for this trip.
+
+Destination: ${form.destination}
+Duration: ${form.duration} days
+Travel Dates: ${form.startDate || "Flexible"}
+Departure location: ${form.departure || "UK"}
+
+Respond with EXACTLY these sections:
 
 ## Season & Timing
-Weather and crowd expectations for their dates. Any alerts or advantages.
+Weather and crowd expectations for their dates. Include a "Best time to book" subheading with flight booking timing advice.
 
-## Safety & Health
-Destination-specific safety tips, vaccinations, common scams.
+## Health & Safety
+Destination-specific safety tips, vaccinations, common scams. Include an "Emergency Contacts" subheading with local emergency number and nearest embassy/consulate guidance.
 
 ## Visa & Entry
 Entry requirements for UK, US, EU passport holders. Costs and method.
+
+## Flight Estimate
+Rough return flight cost range from ${form.departure || "the UK"} to ${form.destination}, and the best time to book for this trip date.
 
 ## Essential Apps
 6-8 specific apps for this destination with a reason for each.
@@ -513,31 +587,19 @@ Entry requirements for UK, US, EU passport holders. Costs and method.
 ## Packing & Prep
 4 highly specific tips for this exact route.
 
-Write like a well-travelled friend. Specific, practical, direct. Around 1000 words total.`;
+Be specific and concise. Bullet points over paragraphs where possible. Around 1400 words total.`;
 
-    try {
-            const controller = new AbortController();
-const timeoutId = setTimeout(() => controller.abort(), 90000);
-const res = await fetch("/api/generate", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ prompt }),
-  signal: controller.signal,
-});
-clearTimeout(timeoutId);
+  try {
+    const text = await callAI(prompt);
+    setFullResult2(text);
+    setUnlocked(true);
+  } catch {
+    setError("Something went wrong loading the final details. Please try again.");
+  } finally {
+    setLoadingStage(null);
+  }
+};
 
-
-
-      const data = await res.json();
-      const text = data.content?.map((b) => b.text || "").join("\n") || "";
-setResult(text || "Something went wrong generating this one — please try again.");
-
-
-    } catch (err) {
-      setError("Error: " + err.message);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const resetAll = () => {
