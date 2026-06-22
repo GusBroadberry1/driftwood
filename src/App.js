@@ -599,9 +599,6 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
     setLoadingStage(null);
   }
 };
-
-  };
-
   const resetAll = () => {
     setResult(null);
     setStep(0);
