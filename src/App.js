@@ -814,7 +814,7 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
       <div style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, boxShadow: "0 1px 8px rgba(0,0,0,0.04)" }}>
         <DriftwoodLogo />
-        {!result && (
+        {!previewResult && (
           <span style={{ fontSize: "10px", fontFamily: font.body, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", background: C.driftLight, color: C.driftMid, padding: "4px 10px", borderRadius: "20px", border: `1px solid ${C.borderDark}` }}>
             Beta
           </span>
