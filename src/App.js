@@ -691,12 +691,12 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
         <Label>Who's travelling?</Label>
         <SelectCard options={groupOptions} value={form.group} onChange={(v) => setField("group", v)} cols={4} />
       </div>
+            <div style={{ marginBottom: "22px" }}>
+        <Label hint="Used to estimate flight costs">Departure airport or region</Label>
+        <TextInput placeholder="e.g. Manchester, London Gatwick" value={form.departure} onChange={(v) => setField("departure", v)} />
+      </div>
       <NavButtons onBack={() => { setStep(0); setVibeQ(vibeQuestions.length - 1); }} onNext={() => setStep(2)} nextDisabled={!form.destination || !form.duration || !form.budget} />
     </div>
-    <div style={{ marginBottom: "22px" }}>
-  <Label hint="Used to estimate flight costs">Departure airport or region</Label>
-  <TextInput placeholder="e.g. Manchester, London Gatwick" value={form.departure} onChange={(v) => setField("departure", v)} />
-</div>
   );
 
   const renderPreferences = () => (
