@@ -735,62 +735,78 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
   );
 
   const renderPreview = () => {
-  ... (the whole function)
-};
+    const sections = parseOutput(previewResult);
+  const p = personality || { name: "The Savvy Explorer", emoji: "🧭" };
+  return (
+    <div>
+      <div style={{ background: `linear-gradient(135deg, ${C.drift} 0%, #3D2B1A 100%)`, borderRadius: "16px", padding: "28px", marginBottom: "20px", color: "#fff" }}>
+        <div style={{ fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600, opacity: 0.7, marginBottom: "8px", fontFamily: font.body }}>Your Driftwood Preview</div>
+        <h2 style={{ fontFamily: font.display, fontSize: "30px", margin: "0 0 4px", fontWeight: 600 }}>{form.destination}</h2>
+        <div style={{ fontSize: "14px", opacity: 0.8, fontFamily: font.body }}>{form.duration} days · £{form.budget}/day · {p.emoji} {p.name}</div>
+      </div>
 
-const renderResult = () => {
-    const sections = parseOutput(result);
-    const p = personality || { name: "The Savvy Explorer", emoji: "🧭" };
-    return (
-      <div>
-        <div style={{ background: `linear-gradient(135deg, ${C.drift} 0%, #3D2B1A 100%)`, borderRadius: "16px", padding: "28px", marginBottom: "20px", color: "#fff", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "120px", height: "120px", borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
-          <div style={{ position: "absolute", bottom: "-30px", right: "30px", width: "80px", height: "80px", borderRadius: "50%", background: "rgba(255,255,255,0.04)" }} />
-          <div style={{ fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600, opacity: 0.7, marginBottom: "8px", fontFamily: font.body }}>Your Driftwood Itinerary</div>
-          <h2 style={{ fontFamily: font.display, fontSize: "30px", margin: "0 0 4px", fontWeight: 600, lineHeight: 1.1 }}>{form.destination}</h2>
-          <div style={{ fontSize: "14px", opacity: 0.8, fontFamily: font.body, marginBottom: "20px" }}>
-            {form.duration} days · £{form.budget}/day · {p.emoji} {p.name}
-          </div>
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            {[
-              `👥 ${groupOptions.find((g) => g.value === form.group)?.label || "Solo"}`,
-              `🛏 ${accomOptions.find((a) => a.value === form.accom)?.label}`,
-              `${paceOptions.find((pp) => pp.value === form.pace)?.icon} ${paceOptions.find((pp) => pp.value === form.pace)?.label}`,
-            ].map((tag, i) => (
-              <span key={i} style={{ background: "rgba(255,255,255,0.15)", borderRadius: "20px", padding: "5px 12px", fontSize: "12px", fontFamily: font.body }}>{tag}</span>
-            ))}
-          </div>
-        </div>
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "16px" }}>
+        <OutputSection emoji="💰" title="Budget Breakdown">
+          <BudgetVisualiser budget={Number(form.budget)} duration={Number(form.duration)} />
+        </OutputSection>
+      </div>
 
-        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "16px" }}>
-          <OutputSection emoji="💰" title="Budget Breakdown">
-            <BudgetVisualiser budget={Number(form.budget)} duration={Number(form.duration)} />
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "20px" }}>
+        {sections.map((s, i) => (
+          <OutputSection key={s.id} emoji={s.emoji} title={s.title} last={i === sections.length - 1}>
+            <div style={{ fontSize: "14px", lineHeight: "1.85", color: C.textMid, fontFamily: font.body }}>{renderMarkdown(s.body)}</div>
           </OutputSection>
-        </div>
+        ))}
+      </div>
 
-        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "20px" }}>
-          {sections.map((s, i) => (
-            <OutputSection key={s.id} emoji={s.emoji} title={s.title} last={i === sections.length - 1}>
-              <div style={{ fontSize: "14px", lineHeight: "1.85", color: C.textMid, fontFamily: font.body, }}>{renderMarkdown(s.body)}</div>
+      {!fullResult1 && !fullResult2 && loadingStage !== "call1" && loadingStage !== "call2" && (
+        <div style={{ background: C.driftLight, border: `1px solid ${C.borderDark}`, borderRadius: "16px", padding: "24px", textAlign: "center", marginBottom: "20px" }}>
+          <div style={{ fontSize: "13px", fontFamily: font.body, color: C.muted, marginBottom: "14px" }}>
+            🔒 The full itinerary includes day-by-day plans, accommodation, safety, visas, apps, language and packing
+          </div>
+          <button onClick={generateFull1} style={{ width: "100%", background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", borderRadius: "10px", padding: "16px", fontSize: "15px", fontWeight: 600, color: "#fff", cursor: "pointer", fontFamily: font.body }}>
+            Unlock Full Itinerary — £8
+          </button>
+        </div>
+      )}
+
+      {(loadingStage === "call1" || loadingStage === "call2") && (
+        <div style={{ textAlign: "center", padding: "40px 20px" }}>
+          <div style={{ fontSize: "13px", fontFamily: font.body, color: C.muted }}>
+            {loadingStage === "call1" ? "Building your days and stays…" : "Adding the essentials…"}
+          </div>
+        </div>
+      )}
+
+      {fullResult1 && (
+        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "16px" }}>
+          {parseOutput(fullResult1).map((s, i) => (
+            <OutputSection key={s.id} emoji={s.emoji} title={s.title} last={i === parseOutput(fullResult1).length - 1}>
+              <div style={{ fontSize: "14px", lineHeight: "1.85", color: C.textMid, fontFamily: font.body }}>{renderMarkdown(s.body)}</div>
             </OutputSection>
           ))}
         </div>
+      )}
 
-        <div style={{ textAlign: "center", marginBottom: "12px" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginBottom: "6px" }}>
-            <svg width="20" height="12" viewBox="0 0 36 22" fill="none">
-              <path d="M2 16 C6 8, 12 8, 18 11 C24 14, 30 14, 34 6" stroke={C.drift} strokeWidth="2" strokeLinecap="round" fill="none"/>
-            </svg>
-            <span style={{ fontFamily: font.display, fontSize: "15px", color: C.drift }}>Driftwood</span>
-          </div>
-          <p style={{ fontSize: "11px", color: C.muted, fontFamily: font.body, margin: "0 0 16px" }}>Always verify visa and health requirements with official sources before travel.</p>
+      {fullResult2 && (
+        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "20px" }}>
+          {parseOutput(fullResult2).map((s, i) => (
+            <OutputSection key={s.id} emoji={s.emoji} title={s.title} last={i === parseOutput(fullResult2).length - 1}>
+              <div style={{ fontSize: "14px", lineHeight: "1.85", color: C.textMid, fontFamily: font.body }}>{renderMarkdown(s.body)}</div>
+            </OutputSection>
+          ))}
         </div>
+      )}
 
+      {unlocked && (
         <button onClick={resetAll} style={{ width: "100%", background: "transparent", border: `1.5px solid ${C.drift}`, color: C.drift, borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
           ← Plan Another Trip
         </button>
-      </div>
-    );
+      )}
+    </div>
+  );
+
+
   };
 
   return (
