@@ -599,12 +599,17 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
     setLoadingStage(null);
   }
 };
-  const resetAll = () => {
-    setResult(null);
+    const resetAll = () => {
+    setPreviewResult(null);
+    setFullResult1(null);
+    setFullResult2(null);
+    setUnlocked(false);
     setStep(0);
     setVibeQ(0);
     setVibeAnswers({});
-    setForm({ destination: "", duration: "", budget: "", startDate: "", group: "", accom: "", pace: "", transit: "3", interests: [], avoids: [], notes: "" });
+    setForm({ destination: "", duration: "", budget: "", departure: "", startDate: "", group: "", accom: "", pace: "", transit: "3", interests: [], avoids: [], notes: "" });
+  };
+
   };
 
   const renderVibeQuiz = () => {
