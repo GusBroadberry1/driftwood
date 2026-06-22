@@ -802,11 +802,12 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
       </div>
 
       <div style={{ maxWidth: "580px", margin: "0 auto", padding: "36px 20px 80px" }}>
-        {!previewResult && !loadingStage && step === 0 && <div><ProgressBar step={0} />{renderVibeQuiz()}</div>}
+        <>
+{!previewResult && !loadingStage && step === 0 && <div><ProgressBar step={0} />{renderVibeQuiz()}</div>}
 {!previewResult && !loadingStage && step === 1 && <div><ProgressBar step={1} />{renderTripBasics()}</div>}
 {!previewResult && !loadingStage && step === 2 && <div><ProgressBar step={2} />{renderPreferences()}</div>}
 {!previewResult && !loadingStage && step === 3 && <div><ProgressBar step={3} />{renderFinalDetails()}</div>}
-
+</>
 {loadingStage === "preview" && (
   <div style={{ textAlign: "center", padding: "80px 20px" }}>
     <DriftwoodLogo size="large" />
