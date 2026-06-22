@@ -729,7 +729,7 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
           style={{ width: "100%", boxSizing: "border-box", minHeight: "90px", border: `1.5px solid ${C.border}`, borderRadius: "10px", padding: "13px 16px", fontSize: "14px", fontFamily: font.body, color: C.text, background: C.surface, outline: "none", resize: "vertical" }} />
       </div>
       {error && <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: "10px", padding: "12px 16px", color: C.error, fontSize: "13px", fontFamily: font.body, marginBottom: "16px" }}>{error}</div>}
-      <NavButtons onBack={() => setStep(2)} onNext={generate} nextLabel={loading ? "Building your itinerary…" : "Build My Itinerary"} nextDisabled={!canGenerate || loading} />
+      <NavButtons onBack={() => setStep(2)} onNext={generatePreview} nextLabel={loadingStage ? "Building your itinerary…" : "Build My Itinerary"} nextDisabled={!canGenerate || loadingStage} />
       {!canGenerate && <p style={{ fontSize: "12px", color: C.muted, textAlign: "center", marginTop: "10px", fontFamily: font.body }}>Select at least one interest to continue</p>}
     </div>
   );
@@ -802,22 +802,20 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
       </div>
 
       <div style={{ maxWidth: "580px", margin: "0 auto", padding: "36px 20px 80px" }}>
-        {!result && !loading && step === 0 && <div><ProgressBar step={0} />{renderVibeQuiz()}</div>}
-        {!result && !loading && step === 1 && <div><ProgressBar step={1} />{renderTripBasics()}</div>}
-        {!result && !loading && step === 2 && <div><ProgressBar step={2} />{renderPreferences()}</div>}
-        {!result && !loading && step === 3 && <div><ProgressBar step={3} />{renderFinalDetails()}</div>}
+        {!previewResult && !loadingStage && step === 0 && <div><ProgressBar step={0} />{renderVibeQuiz()}</div>}
+{!previewResult && !loadingStage && step === 1 && <div><ProgressBar step={1} />{renderTripBasics()}</div>}
+{!previewResult && !loadingStage && step === 2 && <div><ProgressBar step={2} />{renderPreferences()}</div>}
+{!previewResult && !loadingStage && step === 3 && <div><ProgressBar step={3} />{renderFinalDetails()}</div>}
 
-        {loading && (
-          <div style={{ textAlign: "center", padding: "80px 20px" }}>
-            <DriftwoodLogo size="large" />
-            <div style={{ marginTop: "40px" }}>
-              <div style={{ fontSize: "13px", fontFamily: font.body, color: C.muted }}>Plotting your route, matching accommodation,</div>
-              <div style={{ fontSize: "13px", fontFamily: font.body, color: C.muted }}>checking visas and building your days…</div>
-            </div>
-          </div>
-        )}
+{loadingStage === "preview" && (
+  <div style={{ textAlign: "center", padding: "80px 20px" }}>
+    <DriftwoodLogo size="large" />
+    <div style={{ marginTop: "40px", fontSize: "13px", fontFamily: font.body, color: C.muted }}>Plotting your route…</div>
+  </div>
+)}
 
-        {result && !loading && renderResult()}
+{previewResult && renderPreview()}
+
       </div>
     </div>
   );
