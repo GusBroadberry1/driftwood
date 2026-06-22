@@ -440,13 +440,17 @@ export default function App() {
   const [vibeAnswers, setVibeAnswers] = useState({});
   const [vibeQ, setVibeQ] = useState(0);
   const [form, setForm] = useState({
-    destination: "", duration: "", budget: "",
+    destination: "", duration: "", budget: "", departure:""
     startDate: "", group: "", accom: "", pace: "",
     transit: "3", interests: [], avoids: [], notes: "",
   });
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [previewResult, setPreviewResult] = useState(null);
+const [fullResult1, setFullResult1] = useState(null);
+const [fullResult2, setFullResult2] = useState(null);
+const [unlocked, setUnlocked] = useState(false);
+const [loadingStage, setLoadingStage] = useState(null);
+const [error, setError] = useState(null);
+
 
   const personality = Object.keys(vibeAnswers).length >= 3 ? derivePersonality(vibeAnswers) : null;
   const toggle = (field, val) =>
@@ -630,6 +634,10 @@ setResult(text || "Something went wrong generating this one — please try again
       </div>
       <NavButtons onBack={() => { setStep(0); setVibeQ(vibeQuestions.length - 1); }} onNext={() => setStep(2)} nextDisabled={!form.destination || !form.duration || !form.budget} />
     </div>
+    <div style={{ marginBottom: "22px" }}>
+  <Label hint="Used to estimate flight costs">Departure airport or region</Label>
+  <TextInput placeholder="e.g. Manchester, London Gatwick" value={form.departure} onChange={(v) => setField("departure", v)} />
+</div>
   );
 
   const renderPreferences = () => (
