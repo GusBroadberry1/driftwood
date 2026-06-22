@@ -807,7 +807,6 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
 {!previewResult && !loadingStage && step === 1 && <div><ProgressBar step={1} />{renderTripBasics()}</div>}
 {!previewResult && !loadingStage && step === 2 && <div><ProgressBar step={2} />{renderPreferences()}</div>}
 {!previewResult && !loadingStage && step === 3 && <div><ProgressBar step={3} />{renderFinalDetails()}</div>}
-</>
 {loadingStage === "preview" && (
   <div style={{ textAlign: "center", padding: "80px 20px" }}>
     <DriftwoodLogo size="large" />
@@ -816,7 +815,7 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
 )}
 
 {previewResult && renderPreview()}
-
+</>
       </div>
     </div>
   );
