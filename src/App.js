@@ -762,6 +762,11 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
         ))}
       </div>
 
+{error && (
+  <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: "10px", padding: "12px 16px", color: C.error, fontSize: "13px", fontFamily: font.body, marginBottom: "16px" }}>
+    {error}
+  </div>
+)}
       {!fullResult1 && !fullResult2 && loadingStage !== "call1" && loadingStage !== "call2" && (
         <div style={{ background: C.driftLight, border: `1px solid ${C.borderDark}`, borderRadius: "16px", padding: "24px", textAlign: "center", marginBottom: "20px" }}>
           <div style={{ fontSize: "13px", fontFamily: font.body, color: C.muted, marginBottom: "14px" }}>
