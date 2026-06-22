@@ -549,7 +549,7 @@ Write like a well-travelled friend. Specific, practical, concise bullet points o
     const text = await callAI(prompt);
     setFullResult1(text);
   } catch {
-    setError("Something went wrong. Please try again.");
+    setError("Error in Call 1 + err.message");
   } finally {
     setLoadingStage("call2");
     generateFull2();
