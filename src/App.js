@@ -440,7 +440,7 @@ export default function App() {
   const [vibeAnswers, setVibeAnswers] = useState({});
   const [vibeQ, setVibeQ] = useState(0);
   const [form, setForm] = useState({
-    destination: "", duration: "", budget: "", departure:""
+    destination: "", duration: "", budget: "", departure:"",
     startDate: "", group: "", accom: "", pace: "",
     transit: "3", interests: [], avoids: [], notes: "",
   });
