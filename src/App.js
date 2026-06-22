@@ -734,7 +734,11 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
     </div>
   );
 
-  const renderResult = () => {
+  const renderPreview = () => {
+  ... (the whole function)
+};
+
+const renderResult = () => {
     const sections = parseOutput(result);
     const p = personality || { name: "The Savvy Explorer", emoji: "🧭" };
     return (
