@@ -811,9 +811,6 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
     </div>
   );
 
-
-  };
-
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
