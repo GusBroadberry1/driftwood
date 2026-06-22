@@ -610,8 +610,6 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
     setForm({ destination: "", duration: "", budget: "", departure: "", startDate: "", group: "", accom: "", pace: "", transit: "3", interests: [], avoids: [], notes: "" });
   };
 
-  };
-
   const renderVibeQuiz = () => {
     const q = vibeQuestions[vibeQ];
     return (
