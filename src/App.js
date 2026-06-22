@@ -765,7 +765,7 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
             🔒 The full itinerary includes day-by-day plans, accommodation, safety, visas, apps, language and packing
           </div>
           <button onClick={generateFull1} style={{ width: "100%", background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", borderRadius: "10px", padding: "16px", fontSize: "15px", fontWeight: 600, color: "#fff", cursor: "pointer", fontFamily: font.body }}>
-            Unlock Full Itinerary — £8
+            Unlock Full Itinerary — £5.99
           </button>
         </div>
       )}
