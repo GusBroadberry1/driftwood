@@ -28,6 +28,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     res.status(200).json({ url: session.url });
   } catch (err) {
+    console.log("CHECKOUT ERROR:", err.message);
     res.status(500).json({ error: err.message });
-  }
+}
+
 }
