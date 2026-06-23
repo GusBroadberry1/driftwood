@@ -551,9 +551,9 @@ Respond with EXACTLY these sections, each kept concise:
 
 ${isLong
   ? `## Trip Breakdown
-Phases covering roughly 2 weeks each (~6 phases for a 90 day trip). Each phase: location, 2-3 key activities, one restaurant tip, transit note. Maximum 3 sentences per phase.`
+This is a longer trip (${form.duration} days). Structure as phases covering roughly 2 weeks each — for a 90 day trip this means about 6 phases total, not one per week. Keep each phase to 4-5 sentences maximum, no exceptions. Pace note: ${form.pace === "fast_packed" ? "move to a new location every 2-3 days within each phase" : form.pace === "slow_deep" ? "settle into 1-2 base locations per phase, minimal moving" : "a balanced mix of settling in and moving on"}.`
   : `## Day-by-Day Breakdown
-Days 2 onwards. Each day: Morning/Afternoon/Evening as short bullets. One restaurant tip per day. Keep each day tight — no more than 5 bullet points total.`
+Days 2 onwards. Each day: Morning/Afternoon/Evening as short bullets. One restaurant tip per day. Keep each day tight — no more than 5 bullet points total. Pace note: ${form.pace === "fast_packed" ? "change location every 2-3 days, don't linger" : form.pace === "slow_deep" ? "stay in 1-2 places for most of the trip, deep not wide" : "moderate movement between locations"}.`
 }
 
 ## Season & Timing
