@@ -100,6 +100,7 @@ const groupOptions = [
   { value: "couple", label: "Couple", icon: "👫" },
   { value: "small_group", label: "Small Group", icon: "👥" },
   { value: "mixed_group", label: "Mixed Group", icon: "🎒" },
+  { value: "family", label: "Family", icon: "👨‍👩‍👧" },
 ];
 
 const durationOptions = [
