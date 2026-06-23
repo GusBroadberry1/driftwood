@@ -86,6 +86,7 @@ const accomOptions = [
   { value: "social_nomad", label: "Social Nomad", desc: "4–8 bed dorms, hostel bars", icon: "🛏" },
   { value: "party_hostel", label: "Party Hostel", desc: "8–16 bed, events every night", icon: "🎉" },
   { value: "mixed", label: "Flexible", desc: "Dorms on transit nights, private when resting", icon: "⚖️" },
+  { value: "comfort_hotels", label: "Comfort & Hotels", desc: "Private hotels, more comfort, less hostel-hopping", icon: "🏨" },
 ];
 
 const paceOptions = [
@@ -698,7 +699,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
       <div style={{ marginBottom: "24px" }}><Label>Accommodation vibe</Label><SelectCard options={accomOptions} value={form.accom} onChange={(v) => setField("accom", v)} cols={2} /></div>
       <div style={{ marginBottom: "24px" }}><Label>Travel pace</Label><SelectCard options={paceOptions} value={form.pace} onChange={(v) => setField("pace", v)} cols={3} /></div>
       <div style={{ marginBottom: "24px" }}>
-        <Label hint="1 = taxis only  ·  5 = local buses, tuk-tuks, anything goes">Local transit comfort — {form.transit}/5</Label>
+        <Label hint="1 = taxis only  ·  5 = local buses, tuk-tuks, anything goes">Local Transport Style — {form.transit}/5</Label>
         <input type="range" min="1" max="5" value={form.transit} onChange={(e) => setField("transit", e.target.value)}
           style={{ width: "100%", accentColor: C.drift, cursor: "pointer", marginBottom: "4px" }} />
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: C.muted, fontFamily: font.body }}>
