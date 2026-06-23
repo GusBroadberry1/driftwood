@@ -538,7 +538,7 @@ Personality-matched picks. 2 specific hostels/stays per main location with night
 
 ${isLong
   ? `## Trip Breakdown
-This is a longer trip (${form.duration} days). Structure as phases, roughly one phase per week or per location — not individual days. For each phase: location/region, vibe summary, 3-4 key activities matched to interests, one restaurant recommendation, transit note for the next phase.`
+This is a longer trip (${form.duration} days). Structure as phases, covering roughly 2 weeks each — for a 90 day trip this means about 6 phases total, not one per week. Keep each phase to 4-5 sentences maximum, no exceptions.. For each phase: location/region, vibe summary, 3-4 key activities matched to interests, one restaurant recommendation, transit note for the next phase.`
   : `## Day-by-Day Breakdown
 Days 2 onwards (day 1 was already covered). Each day: Morning / Afternoon / Evening as short bullet points, matched to interests. Include one restaurant recommendation per day, plus a transit note and one insider tip.`
 }
