@@ -510,7 +510,7 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
   }
 };
 
-const generateFull1 = async () => {
+  const generateFull = async () => {
   setLoadingStage("call1");
   const p = personality || { name: "The Savvy Explorer", desc: "" };
   const isLong = Number(form.duration) > 21;
@@ -527,80 +527,53 @@ TRAVELLER PROFILE:
 - Interests: ${form.interests.join(", ")}
 - Avoid: ${form.avoids.length ? form.avoids.join(", ") : "Nothing specified"}
 - Notes: ${form.notes || "None"}
+- Travel Dates: ${form.startDate || "Flexible"}
+- Departure location: ${form.departure || "UK"}
 
-Respond with EXACTLY these sections:
+Respond with EXACTLY these sections, each kept concise:
 
 ## Top Picks
-3 standout highlights of this trip, one line each, the things they absolutely shouldn't miss.
+3 standout highlights, one line each.
 
 ## Accommodation
-Personality-matched picks. 2 specific hostels/stays per main location with nightly cost, neighbourhood context, and whether to book ahead or walk in.
+1 specific hostel/stay per main location, with nightly cost and one line of context.
 
 ${isLong
   ? `## Trip Breakdown
-This is a longer trip (${form.duration} days). Structure as phases, covering roughly 2 weeks each — for a 90 day trip this means about 6 phases total, not one per week. Keep each phase to 4-5 sentences maximum, no exceptions.. For each phase: location/region, vibe summary, 3-4 key activities matched to interests, one restaurant recommendation, transit note for the next phase.`
+Phases covering roughly 2 weeks each (~6 phases for a 90 day trip). Each phase: location, 2-3 key activities, one restaurant tip, transit note. Maximum 3 sentences per phase.`
   : `## Day-by-Day Breakdown
-Days 2 onwards (day 1 was already covered). Each day: Morning / Afternoon / Evening as short bullet points, matched to interests. Include one restaurant recommendation per day, plus a transit note and one insider tip.`
+Days 2 onwards. Each day: Morning/Afternoon/Evening as short bullets. One restaurant tip per day. Keep each day tight — no more than 5 bullet points total.`
 }
 
-Write like a well-travelled friend. Specific, practical, concise bullet points over long paragraphs. Around 1200 words total.`;
+## Season & Timing
+2-3 sentences on weather/crowds, plus one line on best time to book flights.
+
+## Health & Safety
+3-4 key safety points and a one-line emergency contact note.
+
+## Visa & Entry
+One line per passport type (UK/US/EU).
+
+## Flight Estimate
+One line: rough return cost from ${form.departure || "the UK"} and best booking window.
+
+## Essential Apps
+4-5 apps, one line each.
+
+## Language Cheat Sheet
+6 essential phrases with phonetic pronunciation.
+
+## Packing & Prep
+2 specific, non-obvious tips.
+
+Write like a well-travelled friend. Be concise and specific — bullet points, not paragraphs. Total response under 1600 words.`;
 
   try {
     const text = await callAI(prompt);
     setFullResult1(text);
-  } catch {
-    setError("Error in Call 1 + err.message");
-  } finally {
-    setLoadingStage("call2");
-    generateFull2();
-  }
-};
-
-const generateFull2 = async () => {
-  const prompt = `You are an expert backpacker travel planner. Provide the practical essentials for this trip.
-
-Destination: ${form.destination}
-Duration: ${form.duration} days
-Travel Dates: ${form.startDate || "Flexible"}
-Departure location: ${form.departure || "UK"}
-
-Respond with EXACTLY these sections:
-
-## Season & Timing
-Weather and crowd expectations for their dates. Include a "Best time to book" subheading with flight booking timing advice.
-
-## Health & Safety
-Destination-specific safety tips, vaccinations, common scams. Include an "Emergency Contacts" subheading with local emergency number and nearest embassy/consulate guidance.
-
-## Visa & Entry
-Entry requirements for UK, US, EU passport holders. Costs and method.
-
-## Flight Estimate
-Rough return flight cost range from ${form.departure || "the UK"} to ${form.destination}, and the best time to book for this trip date.
-
-## Essential Apps
-6-8 specific apps for this destination with a reason for each.
-
-## Language Cheat Sheet
-10 essential phrases with phonetic pronunciation.
-
-## Packing & Prep
-4 highly specific tips for this exact route.
-
-Be specific and concise. Bullet points over paragraphs where possible. Around 1400 words total.`;
-
-    try {
-    const text = await callAI(prompt);
-    setFullResult2(text);
     setUnlocked(true);
-  } catch {
-    try {
-      const text = await callAI(prompt);
-      setFullResult2(text);
-      setUnlocked(true);
-    } catch (err) {
-      setError("Something went wrong loading the final details: " + err.message);
-    }
+  } catch (err) {
+    setError("Something went wrong: " + err.message);
   } finally {
     setLoadingStage(null);
   }
@@ -635,7 +608,7 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
           {q.options.map((opt, i) => {
             const selected = vibeAnswers[q.id] === String(i);
             return (
-              <button key={i} onClick={() => {
+              <button key={i} ={() => {
                 const next = { ...vibeAnswers, [q.id]: String(i) };
                 setVibeAnswers(next);
                 setTimeout(() => {
@@ -773,24 +746,22 @@ Be specific and concise. Bullet points over paragraphs where possible. Around 14
     {error}
   </div>
 )}
-      {!fullResult1 && !fullResult2 && loadingStage !== "call1" && loadingStage !== "call2" && (
+      {!fullResult1 && !fullResult2 && loadingStage !== "call1" && (
         <div style={{ background: C.driftLight, border: `1px solid ${C.borderDark}`, borderRadius: "16px", padding: "24px", textAlign: "center", marginBottom: "20px" }}>
           <div style={{ fontSize: "13px", fontFamily: font.body, color: C.muted, marginBottom: "14px" }}>
             🔒 The full itinerary includes day-by-day plans, accommodation, safety, visas, apps, language and packing
           </div>
-          <button onClick={generateFull1} style={{ width: "100%", background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", borderRadius: "10px", padding: "16px", fontSize: "15px", fontWeight: 600, color: "#fff", cursor: "pointer", fontFamily: font.body }}>
+          <button onClick={generateFull} style={{ width: "100%", background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", borderRadius: "10px", padding: "16px", fontSize: "15px", fontWeight: 600, color: "#fff", cursor: "pointer", fontFamily: font.body }}>
             Unlock Full Itinerary — £5.99
           </button>
         </div>
       )}
 
-      {(loadingStage === "call1" || loadingStage === "call2") && (
-        <div style={{ textAlign: "center", padding: "40px 20px" }}>
-          <div style={{ fontSize: "13px", fontFamily: font.body, color: C.muted }}>
-            {loadingStage === "call1" ? "Building your days and stays…" : "Adding the essentials…"}
-          </div>
-        </div>
-      )}
+      {loadingStage === "call1" && (
+  <div style={{ textAlign: "center", padding: "40px 20px" }}>
+    <div style={{ fontSize: "13px", fontFamily: font.body, color: C.muted }}>Building your full itinerary…</div>
+  </div>
+)}
 
       {fullResult1 && (
         <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "16px" }}>
