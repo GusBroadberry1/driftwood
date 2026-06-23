@@ -86,7 +86,7 @@ const accomOptions = [
   { value: "social_nomad", label: "Social Nomad", desc: "4–8 bed dorms, hostel bars", icon: "🛏" },
   { value: "party_hostel", label: "Party Hostel", desc: "8–16 bed, events every night", icon: "🎉" },
   { value: "mixed", label: "Flexible", desc: "Dorms on transit nights, private when resting", icon: "⚖️" },
-  { value: "comfort_hotels", label: "Comfort & Hotels", desc: "Private hotels, more comfort, less hostel-hopping", icon: "🏨" },
+  { value: "comfort_hotels", label: "Comfort & Hotels", desc: "Private hotels, more comfort, less hostel-hopping", icon: "🛎️" },
 ];
 
 const paceOptions = [
