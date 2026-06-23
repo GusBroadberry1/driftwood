@@ -589,12 +589,18 @@ Rough return flight cost range from ${form.departure || "the UK"} to ${form.dest
 
 Be specific and concise. Bullet points over paragraphs where possible. Around 1400 words total.`;
 
-  try {
+    try {
     const text = await callAI(prompt);
     setFullResult2(text);
     setUnlocked(true);
   } catch {
-    setError("Something went wrong loading the final details. Please try again.");
+    try {
+      const text = await callAI(prompt);
+      setFullResult2(text);
+      setUnlocked(true);
+    } catch (err) {
+      setError("Something went wrong loading the final details: " + err.message);
+    }
   } finally {
     setLoadingStage(null);
   }
