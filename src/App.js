@@ -608,7 +608,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
           {q.options.map((opt, i) => {
             const selected = vibeAnswers[q.id] === String(i);
             return (
-              <button key={i} ={() => {
+              <button key={i} onClick={() => {
                 const next = { ...vibeAnswers, [q.id]: String(i) };
                 setVibeAnswers(next);
                 setTimeout(() => {
