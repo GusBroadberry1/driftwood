@@ -510,6 +510,16 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
   }
 };
 
+  const goToCheckout = async () => {
+  try {
+    const res = await fetch("/api/create-checkout", { method: "POST" });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+  } catch (err) {
+    setError("Could not start checkout: " + err.message);
+  }
+};
+ 
   const generateFull = async () => {
   setLoadingStage("call1");
   const p = personality || { name: "The Savvy Explorer", desc: "" };
@@ -751,7 +761,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
           <div style={{ fontSize: "13px", fontFamily: font.body, color: C.muted, marginBottom: "14px" }}>
             🔒 The full itinerary includes day-by-day plans, accommodation, safety, visas, apps, language and packing
           </div>
-          <button onClick={generateFull} style={{ width: "100%", background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", borderRadius: "10px", padding: "16px", fontSize: "15px", fontWeight: 600, color: "#fff", cursor: "pointer", fontFamily: font.body }}>
+          <button onClick={goToCheckout} style={{ width: "100%", background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", borderRadius: "10px", padding: "16px", fontSize: "15px", fontWeight: 600, color: "#fff", cursor: "pointer", fontFamily: font.body }}>
             Unlock Full Itinerary — £5.99
           </button>
         </div>
