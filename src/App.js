@@ -455,11 +455,22 @@ const [loadingStage, setLoadingStage] = useState(null);
 const [error, setError] = useState(null);
   useEffect(() => {
   const params = new URLSearchParams(window.location.search);
-  if (params.get("paid") === "true" && previewResult && !fullResult1) {
-    generateFull();
-    window.history.replaceState({}, "", window.location.pathname);
+  if (params.get("paid") === "true") {
+    const savedForm = localStorage.getItem("driftwoodForm");
+    const savedPreview = localStorage.getItem("driftwoodPreview");
+    if (savedForm && savedPreview) {
+      setForm(JSON.parse(savedForm));
+      setPreviewResult(savedPreview);
+      setLoadingStage("call1");
+      window.history.replaceState({}, "", window.location.pathname);
+    }
   }
 }, []);
+useEffect(() => {
+  if (loadingStage === "call1" && previewResult && !fullResult1) {
+    generateFull();
+  }
+}, [loadingStage, previewResult]);
 
 
   const personality = Object.keys(vibeAnswers).length >= 3 ? derivePersonality(vibeAnswers) : null;
@@ -522,6 +533,9 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
 
   const goToCheckout = async () => {
   try {
+    localStorage.setItem("driftwoodForm", JSON.stringify(form));
+    localStorage.setItem("driftwoodPreview", previewResult);
+    localStorage.setItem("driftwoodPersonality", JSON.stringify(personality));
     const res = await fetch("/api/create-checkout", { method: "POST" });
     const data = await res.json();
     if (data.url) window.location.href = data.url;
@@ -529,6 +543,7 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
     setError("Could not start checkout: " + err.message);
   }
 };
+
  
   const generateFull = async () => {
   setLoadingStage("call1");
