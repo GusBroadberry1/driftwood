@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 
 // ─── DRIFTWOOD BRAND TOKENS ───────────────────────────────
 const C = {
@@ -452,6 +453,13 @@ const [fullResult2, setFullResult2] = useState(null);
 const [unlocked, setUnlocked] = useState(false);
 const [loadingStage, setLoadingStage] = useState(null);
 const [error, setError] = useState(null);
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("paid") === "true" && previewResult && !fullResult1) {
+    generateFull();
+    window.history.replaceState({}, "", window.location.pathname);
+  }
+}, []);
 
 
   const personality = Object.keys(vibeAnswers).length >= 3 ? derivePersonality(vibeAnswers) : null;
