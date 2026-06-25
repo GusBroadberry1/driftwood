@@ -125,6 +125,7 @@ const interestOptions = [
   { label: "Wellness & Yoga", icon: "🧘" },
   { label: "Budget Hacks", icon: "💡" },
   { label: "Digital Nomad", icon: "💻" },
+  { label: "Shopping", icon: "🛍️" },
 ];
 
 const avoidOptions = [
@@ -419,7 +420,7 @@ const parseOutput = (text) => {
     ACCOMMODATION: { emoji: "🏨", title: "Where to Stay" },
     "DAY-BY-DAY": { emoji: "📅", title: "Day-by-Day" },
     SEASON: { emoji: "🌤", title: "Season & Timing" },
-    SAFETY: { emoji: "🛡", title: "Safety & Health" },
+    SAFETY: { emoji: "🛡", title: "Health & Safety" },
     VISA: { emoji: "✈️", title: "Visa & Entry" },
     APPS: { emoji: "📱", title: "Essential Apps" },
     LANGUAGE: { emoji: "💬", title: "Language Cheat Sheet" },
@@ -583,7 +584,7 @@ Days 2 onwards. Each day: Morning/Afternoon/Evening as short bullets. One restau
 ## Season & Timing
 2-3 sentences on weather/crowds, plus one line on best time to book flights.
 
-## Health & Safety
+## Safety & Health
 3-4 key safety points and a one-line emergency contact note.
 
 ## Visa & Entry
