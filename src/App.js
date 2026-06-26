@@ -532,12 +532,24 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
   }
 };
 
+ const getPrice = () => {
+  const days = Number(form.duration) || 7;
+  if (days <= 4) return "3.99";
+  if (days <= 14) return "5.99";
+  if (days <= 30) return "6.99";
+  return "8.99";
+};
+
   const goToCheckout = async () => {
   try {
     localStorage.setItem("driftwoodForm", JSON.stringify(form));
     localStorage.setItem("driftwoodPreview", previewResult);
     localStorage.setItem("driftwoodPersonality", JSON.stringify(personality));
-    const res = await fetch("/api/create-checkout", { method: "POST" });
+    const res = await fetch("/api/create-checkout", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ duration: form.duration }),
+});
     const data = await res.json();
     if (data.url) window.location.href = data.url;
   } catch (err) {
@@ -788,7 +800,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
             🔒 The full itinerary includes day-by-day plans, accommodation, safety, visas, apps, language and packing
           </div>
           <button onClick={goToCheckout} style={{ width: "100%", background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", borderRadius: "10px", padding: "16px", fontSize: "15px", fontWeight: 600, color: "#fff", cursor: "pointer", fontFamily: font.body }}>
-            Unlock Full Itinerary — £5.99
+            Unlock Full Itinerary — £{getPrice()}
           </button>
         </div>
       )}
