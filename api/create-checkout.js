@@ -1,5 +1,5 @@
 const Stripe = require("stripe");
-console.log("KEY EXISTS:", !!process.env.STRIPE_SECRET_KEY);
+
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -39,29 +39,4 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-}
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "gbp",
-            product_data: {
-              name: "Driftwood Full Itinerary",
-            },
-            unit_amount: 599,
-          },
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      success_url: `${req.headers.origin}/?paid=true`,
-      cancel_url: `${req.headers.origin}/?paid=false`,
-    });
-
-    res.status(200).json({ url: session.url });
-  } catch (err) {
-    console.log("CHECKOUT ERROR:", err.message);
-    res.status(500).json({ error: err.message });
-}
-
-}
+};
