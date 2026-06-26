@@ -594,10 +594,10 @@ One line per passport type (UK/US/EU).
 One line: rough return cost from ${form.departure || "the UK"} and best booking window.
 
 ## Essential Apps
-4-5 apps, one line each.
+4 apps, one line each.
 
 ## Language Cheat Sheet
-6 essential phrases with phonetic pronunciation.
+5 essential phrases with phonetic pronunciation.
 
 ## Packing & Prep
 2 specific, non-obvious tips.
