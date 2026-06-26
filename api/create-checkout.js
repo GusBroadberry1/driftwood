@@ -1,4 +1,4 @@
-import Stripe from "stripe";
+const Stripe = require("stripe");
 console.log("KEY EXISTS:", !!process.env.STRIPE_SECRET_KEY);
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
     const { duration } = req.body;
     const days = Number(duration) || 7;
 
