@@ -70,6 +70,18 @@ const vibeQuestions = [
       { label: "Photos that make people jealous", icon: "📸" },
     ],
   },
+
+  {
+  id: "souvenir",
+  q: "What's your ideal souvenir from a trip?",
+  options: [
+    { label: "A photo that perfectly captures the moment", icon: "📸" },
+    { label: "A recipe or skill I learned from a local", icon: "🍳" },
+    { label: "Contacts and friendships I'll keep in touch with", icon: "📱" },
+    { label: "A well-organised photo album, properly labelled", icon: "🗺" },
+  ],
+},
+
   {
     id: "budget_style",
     q: "How do you think about money on the road?",
