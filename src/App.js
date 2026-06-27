@@ -883,7 +883,10 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
 
 {previewResult && renderPreview()}
 </>
-      </div>
+  <p style={{ fontSize: "10px", color: C.muted, fontFamily: font.body, textAlign: "center", padding: "20px 0 0" }}>
+  © 2026 Driftwood. All rights reserved.
+</p> 
+  </div>
     </div>
   );
 }
