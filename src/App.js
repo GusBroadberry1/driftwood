@@ -842,10 +842,6 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
           ))}
         </div>
       )}
-
-<p style={{ fontSize: "10px", color: C.muted, fontFamily: font.body, margin: "0 0 16px", textAlign: "center" }}>
-  © 2026 Driftwood. All rights reserved.
-</p>
       {unlocked && (
         <button onClick={resetAll} style={{ width: "100%", background: "transparent", border: `1.5px solid ${C.drift}`, color: C.drift, borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
           ← Plan Another Trip
