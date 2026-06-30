@@ -536,7 +536,7 @@ Morning / Afternoon / Evening for day one only, matched to their interests. Shor
 Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
 
   try {
-    const text = await callAI(promp);
+    const text = await callAI(prompt);
     setPreviewResult(text);
   } catch {
     setError("Something went wrong. Please try again.");
