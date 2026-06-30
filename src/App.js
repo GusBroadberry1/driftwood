@@ -500,7 +500,7 @@ useEffect(() => {
   const res = await fetch("/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt }),
+    body: JSON.stringify({ prompt, isLong }),
   });
   const data = await res.json();
   const text = data.content?.map((b) => b.text || "").join("\n") || "";
@@ -536,7 +536,7 @@ Morning / Afternoon / Evening for day one only, matched to their interests. Shor
 Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
 
   try {
-    const text = await callAI(prompt);
+    const text = await callAI(prompt, isLong);
     setPreviewResult(text);
   } catch {
     setError("Something went wrong. Please try again.");
@@ -626,6 +626,9 @@ One line: rough return cost from ${form.departure || "the UK"} and best booking 
 
 ## Packing & Prep
 2 specific, non-obvious tips.
+
+## Before You Go
+A tight, scannable checklist of 5 final things to confirm before departure (visa, insurance, vaccinations, currency/payment setup, document backups). Use checkmark-style short bullet points, one line each.
 
 Write like a well-travelled friend. Be concise and specific — bullet points, not paragraphs. Total response under 1600 words.`;
 
