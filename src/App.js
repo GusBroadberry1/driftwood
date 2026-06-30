@@ -453,6 +453,7 @@ const parseOutput = (text) => {
 
 export default function App() {
   const [step, setStep] = useState(0);
+  const [showLanding, setShowLanding] = useState(true);
   const [vibeAnswers, setVibeAnswers] = useState({});
   const [vibeQ, setVibeQ] = useState(0);
   const [form, setForm] = useState({
@@ -648,6 +649,26 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setVibeAnswers({});
     setForm({ destination: "", duration: "", budget: "", departure: "", startDate: "", group: "", accom: "", pace: "", transit: "3", interests: [], avoids: [], notes: "" });
   };
+
+const renderLanding = () => (
+  <div style={{ textAlign: "center", padding: "100px 20px 40px" }}>
+    <DriftwoodLogo size="large" />
+    <h1 style={{ fontFamily: font.display, fontSize: "32px", color: C.text, margin: "40px 0 12px", fontWeight: 600 }}>
+      Plan less. Travel more.
+    </h1>
+    <p style={{ color: C.muted, fontSize: "14px", fontFamily: font.body, maxWidth: "360px", margin: "0 auto 32px", lineHeight: 1.6 }}>
+      Fill in a quick 2-3 minute form and get a full, personalised backpacker itinerary — built just for you.
+    </p>
+    <button onClick={() => setShowLanding(false)} style={{
+      background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`,
+      border: "none", borderRadius: "10px", padding: "16px 40px",
+      fontSize: "15px", fontWeight: 600, color: "#fff", cursor: "pointer",
+      fontFamily: font.body, boxShadow: `0 4px 14px ${C.drift}40`,
+    }}>
+      Get Started →
+    </button>
+  </div>
+);
 
   const renderVibeQuiz = () => {
     const q = vibeQuestions[vibeQ];
