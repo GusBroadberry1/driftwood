@@ -496,7 +496,7 @@ useEffect(() => {
   const setField = (field, val) => setForm((f) => ({ ...f, [field]: val }));
   const canGenerate = form.destination && form.duration && form.budget && form.accom && form.pace && form.interests.length >= 1;
 
-  const callAI = async (prompt) => {
+  const callAI = async (prompt, isLong = false) => {
   const res = await fetch("/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
