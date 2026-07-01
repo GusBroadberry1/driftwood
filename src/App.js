@@ -475,6 +475,7 @@ const [error, setError] = useState(null);
     if (savedForm && savedPreview) {
       setForm(JSON.parse(savedForm));
       setPreviewResult(savedPreview);
+      setShowLanding(false);
       setLoadingStage("call1");
       window.history.replaceState({}, "", window.location.pathname);
     }
