@@ -660,7 +660,7 @@ const renderLanding = () => (
       Plan less. Travel more.
     </h1>
     <p style={{ color: C.muted, fontSize: "14px", fontFamily: font.body, maxWidth: "360px", margin: "0 auto 32px", lineHeight: 1.6 }}>
-      Fill in a quick 2-3 minute form and get a full, personalised backpacker itinerary — built just for you.
+      Fill in a quick 2-3 minute form and get a full, personalised travel itinerary — built just for you.
     </p>
     <button onClick={() => setShowLanding(false)} style={{
       background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`,
