@@ -437,6 +437,8 @@ const parseOutput = (text) => {
     APPS: { emoji: "📱", title: "Essential Apps" },
     LANGUAGE: { emoji: "💬", title: "Language Cheat Sheet" },
     PACKING: { emoji: "🎒", title: "Packing & Prep" },
+    "BEFORE YOU GO": { emoji: "✅", title: "Before You Go" },
+ 
   };
   const parts = text.split(/\n(?=##\s)/);
   return parts
