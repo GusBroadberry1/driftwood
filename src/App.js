@@ -910,7 +910,7 @@ const renderVibeQuiz = () => {
 
 {previewResult && renderPreview()}
 </> 
-  </div>
+     </div>
     </div>
   );
 }
