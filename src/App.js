@@ -906,7 +906,6 @@ const renderVibeQuiz = () => {
 )}
 
 {previewResult && renderPreview()}
-</>
   <div style={{ textAlign: "center", padding: "20px 0 0" }}>
   <p style={{ fontSize: "10px", color: C.muted, fontFamily: font.body, margin: "0 0 8px" }}>
     © 2026 Driftwood. All rights reserved.
@@ -917,7 +916,7 @@ const renderVibeQuiz = () => {
     <a href="/privacy.html" style={{ fontSize: "10px", color: C.muted, fontFamily: font.body, textDecoration: "none" }}>Privacy Policy</a>
   </div>
 </div>
- 
+</> 
   </div>
     </div>
   );
