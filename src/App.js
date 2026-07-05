@@ -870,10 +870,12 @@ const renderVibeQuiz = () => {
         </div>
       )}
       {unlocked && (
-        <button onClick={resetAll} style={{ width: "100%", background: "transparent", border: `1.5px solid ${C.drift}`, color: C.drift, borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
-          ← Plan Another Trip
+        ← Plan Another Trip
         </button>
-            )}
+      )}
+      <p style={{ fontSize: "10px", color: C.muted, fontFamily: font.body, textAlign: "center", padding: "20px 0 0" }}>
+        © 2026 Driftwood. All rights reserved.
+      </p>
     </div>
   );
 };
@@ -906,9 +908,6 @@ const renderVibeQuiz = () => {
 )}
 
 {previewResult && renderPreview()}
-  <p style={{ fontSize: "10px", color: C.muted, fontFamily: font.body, textAlign: "center", padding: "20px 0 0" }}>
-  © 2026 Driftwood. All rights reserved.
-</p>
 </> 
   </div>
     </div>
