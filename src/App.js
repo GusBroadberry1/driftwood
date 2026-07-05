@@ -870,7 +870,7 @@ const renderVibeQuiz = () => {
         </div>
       )}
       {unlocked && (
-       &larr; Plan Another Trip
+       Plan Another Trip
         </button>
       )}
       <p style={{ fontSize: "10px", color: C.muted, fontFamily: font.body, textAlign: "center", padding: "20px 0 0" }}>
