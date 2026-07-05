@@ -437,8 +437,6 @@ const parseOutput = (text) => {
     APPS: { emoji: "📱", title: "Essential Apps" },
     LANGUAGE: { emoji: "💬", title: "Language Cheat Sheet" },
     PACKING: { emoji: "🎒", title: "Packing & Prep" },
-    "BEFORE YOU GO": { emoji: "✅", title: "Before You Go" },
- 
   };
   const parts = text.split(/\n(?=##\s)/);
   return parts
@@ -631,7 +629,7 @@ One line: rough return cost from ${form.departure || "the UK"} and best booking 
 2 specific, non-obvious tips.
 
 ## Before You Go
-A tight, scannable checklist of 5 final things to confirm before departure (visa, insurance, vaccinations, currency/payment setup, document backups). Use regular bullet points, one line each. No emoji or tick symbols.
+A tight, scannable checklist of 5 final things to confirm before departure (visa, insurance, vaccinations, currency/payment setup, document backups). Use checkmark-style short bullet points, one line each.
 
 Write like a well-travelled friend. Be concise and specific — bullet points, not paragraphs. Total response under 1600 words.`;
 
