@@ -905,9 +905,16 @@ const renderVibeQuiz = () => {
 
 {previewResult && renderPreview()}
 </>
-  <p style={{ fontSize: "10px", color: C.muted, fontFamily: font.body, textAlign: "center", padding: "20px 0 0" }}>
-  © 2026 Driftwood. All rights reserved.
-</p> 
+  <footer style={{ textAlign: "center", padding: "20px 0 0" }}>
+    <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginBottom: "8px" }}>
+      <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={{ fontSize: "11px", color: C.muted, fontFamily: font.body, textDecoration: "none" }}>Terms</a>
+      <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ fontSize: "11px", color: C.muted, fontFamily: font.body, textDecoration: "none" }}>Privacy</a>
+      <a href="/refund.html" target="_blank" rel="noopener noreferrer" style={{ fontSize: "11px", color: C.muted, fontFamily: font.body, textDecoration: "none" }}>Refunds</a>
+    </div>
+    <p style={{ fontSize: "10px", color: C.muted, fontFamily: font.body, margin: 0 }}>
+      © 2026 Driftwood. All rights reserved.
+    </p>
+  </footer>
   </div>
     </div>
   );
