@@ -564,7 +564,7 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
     const res = await fetch("/api/create-checkout", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ duration: form.duration }),
+  body: JSON.stringify({ duration: effectiveDuration }),
 });
     const data = await res.json();
     if (data.url) window.location.href = data.url;
