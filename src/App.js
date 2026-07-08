@@ -31,7 +31,7 @@ const TOTAL_STEPS = 4;
 
 const vibeQuestions = [
   {
-        id: "arrival",
+    id: "arrival",
     q: "You've just landed. First move?",
     options: [
       { label: "Drop bags, hit the streets immediately", icon: "🏃" },
@@ -122,6 +122,7 @@ const durationOptions = [
   { value: "12", label: "Two Weeks", desc: "10–14 days", icon: "🗺" },
   { value: "21", label: "Extended Trip", desc: "3–4 weeks", icon: "✈️" },
   { value: "90", label: "Extended Travel", desc: "2–3+ months", icon: "🌍" },
+  { value: "custom", label: "Exact Number", desc: "Tell us the precise day count", icon: "🔢" },
 ];
 
 const interestOptions = [
@@ -457,7 +458,7 @@ export default function App() {
   const [vibeAnswers, setVibeAnswers] = useState({});
   const [vibeQ, setVibeQ] = useState(0);
   const [form, setForm] = useState({
-    destination: "", duration: "", budget: "", departure:"",
+    destination: "", duration: "", customDuration: "", budget: "", departure:"",
     startDate: "", group: "", accom: "", pace: "",
     transit: "3", interests: [], avoids: [], notes: "",
   });
@@ -495,7 +496,8 @@ useEffect(() => {
       [field]: f[field].includes(val) ? f[field].filter((x) => x !== val) : [...f[field], val],
     }));
   const setField = (field, val) => setForm((f) => ({ ...f, [field]: val }));
-  const canGenerate = form.destination && form.duration && form.budget && form.accom && form.pace && form.interests.length >= 1;
+  const effectiveDuration = form.duration === "custom" ? form.customDuration : form.duration;
+  const canGenerate = form.destination && form.duration && (form.duration !== "custom" || form.customDuration) && form.budget && form.accom && form.pace && form.interests.length >= 1;
 
   const callAI = async (prompt, isLong = false) => {
   const res = await fetch("/api/generate", {
@@ -517,7 +519,7 @@ const generatePreview = async () => {
 TRAVELLER PROFILE:
 - Travel Personality: ${p.name} — ${p.desc}
 - Destination: ${form.destination}
-- Duration: ${form.duration} days
+- Duration: ${effectiveDuration} days
 - Daily Budget: £${form.budget}/day GBP
 - Travel Dates: ${form.startDate || "Flexible"}
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
@@ -547,7 +549,7 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
 };
 
  const getPrice = () => {
-  const days = Number(form.duration) || 7;
+  const days = Number(effectiveDuration) || 7;
   if (days <= 4) return "3.99";
   if (days <= 14) return "5.99";
   if (days <= 30) return "6.99";
@@ -575,13 +577,13 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
   const generateFull = async () => {
   setLoadingStage("call1");
   const p = personality || { name: "The Savvy Explorer", desc: "" };
-  const isLong = Number(form.duration) > 21;
+  const isLong = Number(effectiveDuration) > 21;
   const prompt = `You are an expert backpacker travel planner. Continue planning this trip in detail.
 
 TRAVELLER PROFILE:
 - Travel Personality: ${p.name}
 - Destination: ${form.destination}
-- Duration: ${form.duration} days
+- Duration: ${effectiveDuration} days
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
 - Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
 - Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}
@@ -602,7 +604,7 @@ Respond with EXACTLY these sections, each kept concise:
 
 ${isLong
   ? `## Trip Breakdown
-This is a longer trip (${form.duration} days). Structure as phases covering roughly 2 weeks each — for a 90 day trip this means about 6 phases total, not one per week. Keep each phase to 4-5 sentences maximum, no exceptions. Pace note: ${form.pace === "fast_packed" ? "move to a new location every 2-3 days within each phase" : form.pace === "slow_deep" ? "settle into 1-2 base locations per phase, minimal moving" : "a balanced mix of settling in and moving on"}.`
+This is a longer trip (${effectiveDuration} days). Structure as phases covering roughly 2 weeks each — for a 90 day trip this means about 6 phases total, not one per week. Keep each phase to 4-5 sentences maximum, no exceptions. Pace note: ${form.pace === "fast_packed" ? "move to a new location every 2-3 days within each phase" : form.pace === "slow_deep" ? "settle into 1-2 base locations per phase, minimal moving" : "a balanced mix of settling in and moving on"}.`
   : `## Day-by-Day Breakdown
 Days 2 onwards. Each day: Morning/Afternoon/Evening as short bullets. One restaurant tip per day. Keep each day tight — no more than 5 bullet points total. Pace note: ${form.pace === "fast_packed" ? "change location every 2-3 days, don't linger" : form.pace === "slow_deep" ? "stay in 1-2 places for most of the trip, deep not wide" : "moderate movement between locations"}.`
 }
@@ -651,7 +653,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setStep(0);
     setVibeQ(0);
     setVibeAnswers({});
-    setForm({ destination: "", duration: "", budget: "", departure: "", startDate: "", group: "", accom: "", pace: "", transit: "3", interests: [], avoids: [], notes: "" });
+    setForm({ destination: "", duration: "", customDuration: "", budget: "", departure: "", startDate: "", group: "", accom: "", pace: "", transit: "3", interests: [], avoids: [], notes: "" });
   };
 
 const renderLanding = () => (
@@ -744,6 +746,11 @@ const renderVibeQuiz = () => {
       <div style={{ marginBottom: "22px" }}>
   <Label>How long is the trip?</Label>
   <SelectCard options={durationOptions} value={form.duration} onChange={(v) => setField("duration", v)} cols={2} />
+  {form.duration === "custom" && (
+    <div style={{ marginTop: "12px" }}>
+      <TextInput type="number" placeholder="e.g. 45" value={form.customDuration} onChange={(v) => setField("customDuration", v)} />
+    </div>
+  )}
 </div>
 <div style={{ marginBottom: "22px" }}>
   <Label>Daily Budget (£)</Label>
@@ -762,7 +769,7 @@ const renderVibeQuiz = () => {
         <Label hint="Used to estimate flight costs">Departure airport or region</Label>
         <TextInput placeholder="e.g. Manchester, London Gatwick" value={form.departure} onChange={(v) => setField("departure", v)} />
       </div>
-      <NavButtons onBack={() => { setStep(0); setVibeQ(vibeQuestions.length - 1); }} onNext={() => setStep(2)} nextDisabled={!form.destination || !form.duration || !form.budget} />
+      <NavButtons onBack={() => { setStep(0); setVibeQ(vibeQuestions.length - 1); }} onNext={() => setStep(2)} nextDisabled={!form.destination || !form.duration || (form.duration === "custom" && !form.customDuration) || !form.budget} />
     </div>
   );
 
@@ -809,12 +816,12 @@ const renderVibeQuiz = () => {
       <div style={{ background: `linear-gradient(135deg, ${C.drift} 0%, #3D2B1A 100%)`, borderRadius: "16px", padding: "28px", marginBottom: "20px", color: "#fff" }}>
         <div style={{ fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600, opacity: 0.7, marginBottom: "8px", fontFamily: font.body }}>Your Driftwood Preview</div>
         <h2 style={{ fontFamily: font.display, fontSize: "30px", margin: "0 0 4px", fontWeight: 600 }}>{form.destination}</h2>
-        <div style={{ fontSize: "14px", opacity: 0.8, fontFamily: font.body }}>{form.duration} days · £{form.budget}/day · {p.emoji} {p.name}</div>
+        <div style={{ fontSize: "14px", opacity: 0.8, fontFamily: font.body }}>{effectiveDuration} days · £{form.budget}/day · {p.emoji} {p.name}</div>
       </div>
 
       <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "16px" }}>
         <OutputSection emoji="💰" title="Budget Breakdown">
-          <BudgetVisualiser budget={Number(form.budget)} duration={Number(form.duration)} />
+          <BudgetVisualiser budget={Number(form.budget)} duration={Number(effectiveDuration)} />
         </OutputSection>
       </div>
 
