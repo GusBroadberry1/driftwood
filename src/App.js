@@ -31,13 +31,13 @@ const TOTAL_STEPS = 4;
 
 const vibeQuestions = [
   {
-    id: "arrival",
+        id: "arrival",
     q: "You've just landed. First move?",
     options: [
       { label: "Drop bags, hit the streets immediately", icon: "🏃" },
       { label: "Find a local café, get my bearings", icon: "☕" },
-      { label: "Check into the hostel and meet people", icon: "🤝" },
-      { label: "Research the best spots for tomorrow", icon: "📍" },
+      { label: "Check in and chill out — no rush today", icon: "😌" },
+      { label: "Map out a rough plan for the next few days", icon: "🗓" },
     ],
   },
   {
