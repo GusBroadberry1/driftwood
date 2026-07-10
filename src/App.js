@@ -29,6 +29,11 @@ const font = {
 
 const TOTAL_STEPS = 4;
 
+// TODO: replace with your real Booking.com affiliate ID once your Partner Programme
+// application (partnerships.booking.com) is approved. Using a placeholder for now
+// means the link still works, it just won't be tracked as your referral yet.
+const BOOKING_AFFILIATE_ID = "YOUR_BOOKING_AID";
+
 const vibeQuestions = [
   {
     id: "arrival",
@@ -499,6 +504,21 @@ useEffect(() => {
   const effectiveDuration = form.duration === "custom" ? form.customDuration : form.duration;
   const canGenerate = form.destination && form.duration && (form.duration !== "custom" || form.customDuration) && form.budget && form.accom && form.pace && form.interests.length >= 1;
 
+  const buildBookingLink = () => {
+    const params = new URLSearchParams();
+    if (form.destination) params.set("ss", form.destination);
+    if (form.startDate) {
+      params.set("checkin", form.startDate);
+      const checkoutDate = new Date(form.startDate);
+      const nights = Number(effectiveDuration) || 7;
+      checkoutDate.setDate(checkoutDate.getDate() + nights);
+      params.set("checkout", checkoutDate.toISOString().split("T")[0]);
+    }
+    params.set("group_adults", "1");
+    params.set("aid", BOOKING_AFFILIATE_ID);
+    return `https://www.booking.com/searchresults.html?${params.toString()}`;
+  };
+
   const callAI = async (prompt, isLong = false) => {
   const res = await fetch("/api/generate", {
     method: "POST",
@@ -860,6 +880,20 @@ const renderVibeQuiz = () => {
           {parseOutput(fullResult1).map((s, i) => (
             <OutputSection key={s.id} emoji={s.emoji} title={s.title} last={i === parseOutput(fullResult1).length - 1}>
               <div style={{ fontSize: "14px", lineHeight: "1.85", color: C.textMid, fontFamily: font.body }}>{renderMarkdown(s.body)}</div>
+              {s.title === "Where to Stay" && (
+                <div style={{ marginTop: "14px" }}>
+                  <a href={buildBookingLink()} target="_blank" rel="noopener noreferrer sponsored" style={{
+                    display: "inline-block", background: C.driftLight, border: `1.5px solid ${C.borderDark}`,
+                    borderRadius: "10px", padding: "10px 16px", fontSize: "13px", fontWeight: 600,
+                    fontFamily: font.body, color: C.drift, textDecoration: "none",
+                  }}>
+                    🔍 Search stays in {form.destination || "your destination"} on Booking.com →
+                  </a>
+                  <div style={{ fontSize: "11px", color: C.muted, fontFamily: font.body, marginTop: "6px" }}>
+                    We may earn a small commission if you book through this link, at no extra cost to you.
+                  </div>
+                </div>
+              )}
             </OutputSection>
           ))}
         </div>
@@ -875,9 +909,14 @@ const renderVibeQuiz = () => {
         </div>
       )}
       {unlocked && (
-        <button onClick={resetAll} style={{ width: "100%", background: "transparent", border: `1.5px solid ${C.drift}`, color: C.drift, borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
-          ← Plan Another Trip
-        </button>
+        <div className="no-print" style={{ display: "flex", gap: "12px" }}>
+          <button onClick={() => window.print()} style={{ flex: 1, background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", color: "#fff", borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
+            📄 Download PDF
+          </button>
+          <button onClick={resetAll} style={{ flex: 1, background: "transparent", border: `1.5px solid ${C.drift}`, color: C.drift, borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
+            ← Plan Another Trip
+          </button>
+        </div>
             )}
     </div>
   );
@@ -887,7 +926,18 @@ const renderVibeQuiz = () => {
 
     <div style={{ minHeight: "100vh", background: C.bg }}>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-      <div style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, boxShadow: "0 1px 8px rgba(0,0,0,0.04)" }}>
+      <style>{`
+        @media print {
+          .no-print { display: none !important; }
+          body { background: #fff !important; }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+        }
+      `}</style>
+      <div className="no-print" style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, boxShadow: "0 1px 8px rgba(0,0,0,0.04)" }}>
         <DriftwoodLogo />
         {!previewResult && (
           <span style={{ fontSize: "10px", fontFamily: font.body, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", background: C.driftLight, color: C.driftMid, padding: "4px 10px", borderRadius: "20px", border: `1px solid ${C.borderDark}` }}>
