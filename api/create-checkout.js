@@ -31,6 +31,7 @@ module.exports = async function handler(req, res) {
         },
       ],
       mode: "payment",
+      allow_promotion_codes: true,
       success_url: `${req.headers.origin}/?paid=true`,
       cancel_url: `${req.headers.origin}/?paid=false`,
     });
