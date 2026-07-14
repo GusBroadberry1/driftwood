@@ -473,6 +473,10 @@ const [fullResult2, setFullResult2] = useState(null);
 const [unlocked, setUnlocked] = useState(false);
 const [loadingStage, setLoadingStage] = useState(null);
 const [error, setError] = useState(null);
+const [reviewRating, setReviewRating] = useState(0);
+const [reviewComment, setReviewComment] = useState("");
+const [reviewSent, setReviewSent] = useState(false);
+const [shareCopied, setShareCopied] = useState(false);
   useEffect(() => {
   const params = new URLSearchParams(window.location.search);
   if (params.get("paid") === "true") {
@@ -674,6 +678,37 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setVibeQ(0);
     setVibeAnswers({});
     setForm({ destination: "", duration: "", customDuration: "", budget: "", departure: "", startDate: "", group: "", accom: "", pace: "", transit: "3", interests: [], avoids: [], notes: "" });
+    setReviewRating(0);
+    setReviewComment("");
+    setReviewSent(false);
+  };
+
+  const sendReview = () => {
+    const subject = encodeURIComponent(`Driftwood review — ${form.destination || "trip"} (${reviewRating}/5)`);
+    const body = encodeURIComponent(
+      `Rating: ${reviewRating}/5\n\nDestination: ${form.destination || "N/A"}\nDuration: ${effectiveDuration || "N/A"} days\n\nComment:\n${reviewComment || "(no comment left)"}`
+    );
+    window.location.href = `mailto:traveldriftwood@gmail.com?subject=${subject}&body=${body}`;
+    setReviewSent(true);
+  };
+
+  const shareDriftwood = async () => {
+    const shareText = "I just planned my trip with Driftwood — use code FRIEND10 for 10% off: https://driftwoodtravel.co";
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "Driftwood", text: shareText, url: "https://driftwoodtravel.co" });
+      } catch (e) {
+        // user cancelled the share sheet, nothing to do
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareText);
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2500);
+      } catch (e) {
+        // clipboard unavailable, silently ignore rather than error
+      }
+    }
   };
 
 const renderLanding = () => (
@@ -909,6 +944,41 @@ const renderVibeQuiz = () => {
         </div>
       )}
       {unlocked && (
+        <div className="no-print" style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "22px", marginBottom: "20px", textAlign: "center" }}>
+          {!reviewSent ? (
+            <>
+              <div style={{ fontSize: "14px", fontWeight: 600, color: C.text, fontFamily: font.body, marginBottom: "10px" }}>
+                Enjoyed your itinerary? Leave a quick review
+              </div>
+              <div style={{ display: "flex", justifyContent: "center", gap: "6px", marginBottom: "14px" }}>
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button key={n} onClick={() => setReviewRating(n)} style={{
+                    background: "transparent", border: "none", cursor: "pointer", fontSize: "26px",
+                    color: n <= reviewRating ? C.warning : C.border, padding: "2px",
+                  }}>★</button>
+                ))}
+              </div>
+              <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)}
+                placeholder="What did you think? (optional)"
+                style={{ width: "100%", boxSizing: "border-box", minHeight: "70px", border: `1.5px solid ${C.border}`, borderRadius: "10px", padding: "12px 14px", fontSize: "13px", fontFamily: font.body, color: C.text, background: C.bg, outline: "none", resize: "vertical", marginBottom: "12px" }} />
+              <button onClick={sendReview} disabled={!reviewRating} style={{
+                background: reviewRating ? `linear-gradient(135deg, ${C.drift}, ${C.driftMid})` : C.surfaceAlt,
+                border: "none", color: reviewRating ? "#fff" : C.muted, borderRadius: "10px",
+                padding: "12px 24px", fontSize: "14px", fontWeight: 600, fontFamily: font.body,
+                cursor: reviewRating ? "pointer" : "not-allowed",
+              }}>
+                Send Review
+              </button>
+            </>
+          ) : (
+            <div style={{ fontSize: "14px", fontFamily: font.body, color: C.drift, fontWeight: 600 }}>
+              🙏 Thanks for your feedback!
+            </div>
+          )}
+        </div>
+      )}
+
+      {unlocked && (
         <div className="no-print" style={{ display: "flex", gap: "12px" }}>
           <button onClick={() => window.print()} style={{ flex: 1, background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", color: "#fff", borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
             📄 Download PDF
@@ -918,6 +988,14 @@ const renderVibeQuiz = () => {
           </button>
         </div>
             )}
+
+      {unlocked && (
+        <div className="no-print" style={{ marginTop: "12px" }}>
+          <button onClick={shareDriftwood} style={{ width: "100%", background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", color: "#fff", borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
+            {shareCopied ? "✅ Copied to clipboard!" : "🔗 Share Driftwood — Give 10% Off"}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
