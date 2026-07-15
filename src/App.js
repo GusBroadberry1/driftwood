@@ -34,6 +34,8 @@ const TOTAL_STEPS = 4;
 // means the link still works, it just won't be tracked as your referral yet.
 const BOOKING_AFFILIATE_ID = "YOUR_BOOKING_AID";
 
+const GOOGLE_REVIEW_LINK = "https://g.page/r/CXlzqccweCGHEAE/review";
+
 const vibeQuestions = [
   {
     id: "arrival",
@@ -945,11 +947,25 @@ const renderVibeQuiz = () => {
       )}
       {unlocked && (
         <div className="no-print" style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "22px", marginBottom: "20px", textAlign: "center" }}>
+          <div style={{ fontSize: "14px", fontWeight: 600, color: C.text, fontFamily: font.body, marginBottom: "14px" }}>
+            Enjoyed your itinerary? Leave us a review
+          </div>
+          <a href={GOOGLE_REVIEW_LINK} target="_blank" rel="noopener noreferrer" style={{
+            display: "block", background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`,
+            border: "none", color: "#fff", borderRadius: "10px", padding: "14px",
+            fontSize: "15px", fontWeight: 600, fontFamily: font.body, textDecoration: "none", marginBottom: "16px",
+          }}>
+            ⭐ Leave a Google Review
+          </a>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "4px 0 16px" }}>
+            <div style={{ flex: 1, height: "1px", background: C.border }} />
+            <span style={{ fontSize: "11px", color: C.muted, fontFamily: font.body, textTransform: "uppercase", letterSpacing: "0.08em" }}>or send private feedback</span>
+            <div style={{ flex: 1, height: "1px", background: C.border }} />
+          </div>
+
           {!reviewSent ? (
             <>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: C.text, fontFamily: font.body, marginBottom: "10px" }}>
-                Enjoyed your itinerary? Leave a quick review
-              </div>
               <div style={{ display: "flex", justifyContent: "center", gap: "6px", marginBottom: "14px" }}>
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button key={n} onClick={() => setReviewRating(n)} style={{
@@ -962,12 +978,12 @@ const renderVibeQuiz = () => {
                 placeholder="What did you think? (optional)"
                 style={{ width: "100%", boxSizing: "border-box", minHeight: "70px", border: `1.5px solid ${C.border}`, borderRadius: "10px", padding: "12px 14px", fontSize: "13px", fontFamily: font.body, color: C.text, background: C.bg, outline: "none", resize: "vertical", marginBottom: "12px" }} />
               <button onClick={sendReview} disabled={!reviewRating} style={{
-                background: reviewRating ? `linear-gradient(135deg, ${C.drift}, ${C.driftMid})` : C.surfaceAlt,
-                border: "none", color: reviewRating ? "#fff" : C.muted, borderRadius: "10px",
+                background: reviewRating ? C.driftLight : C.surfaceAlt,
+                border: `1.5px solid ${reviewRating ? C.borderDark : C.border}`, color: reviewRating ? C.drift : C.muted, borderRadius: "10px",
                 padding: "12px 24px", fontSize: "14px", fontWeight: 600, fontFamily: font.body,
                 cursor: reviewRating ? "pointer" : "not-allowed",
               }}>
-                Send Review
+                Send Private Feedback
               </button>
             </>
           ) : (
