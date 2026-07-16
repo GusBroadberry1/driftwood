@@ -85,7 +85,7 @@ const vibeQuestions = [
     { label: "A photo that perfectly captures the moment", icon: "📸" },
     { label: "A recipe or skill I learned from a local", icon: "🍳" },
     { label: "Contacts and friendships I'll keep in touch with", icon: "📱" },
-    { label: "A well-organised photo album, properly labelled", icon: "🗺" },
+    { label: "Nothing but stamps in my passport", icon: "🛂" },
   ],
 },
 
@@ -110,7 +110,7 @@ const accomOptions = [
 ];
 
 const paceOptions = [
-  { value: "slow_deep", label: "Slow & Deep", desc: "1–2 places, really absorb them", icon: "🐢" },
+  { value: "slow_deep", label: "Slow & Steady", desc: "1–2 places, really absorb them", icon: "🐢" },
   { value: "balanced", label: "Balanced", desc: "A few spots without rushing", icon: "🚶" },
   { value: "fast_packed", label: "Fast & Packed", desc: "Maximise every day", icon: "⚡" },
 ];
