@@ -459,6 +459,61 @@ const parseOutput = (text) => {
     });
 };
 
+const DayAccordion = ({ body, openIndex, onToggle }) => {
+  const looksLikeSubDays = /(^|\n)###\s/.test(body);
+  if (!looksLikeSubDays) {
+    return <div style={{ fontSize: "14px", lineHeight: "1.85", color: C.textMid, fontFamily: font.body }}>{renderMarkdown(body)}</div>;
+  }
+
+  const parts = body.split(/\n(?=###\s)/).filter((p) => p.trim());
+  const entries = parts.map((part, i) => {
+    const lines = part.trim().split("\n");
+    const label = lines[0].replace(/^###\s*/, "").trim();
+    const content = lines.slice(1).join("\n").trim();
+    return { label, content, id: i };
+  });
+
+  const maxRows = 10;
+  let groups;
+  if (entries.length <= maxRows) {
+    groups = entries.map((e) => ({ label: e.label, content: e.content }));
+  } else {
+    const groupSize = Math.ceil(entries.length / maxRows);
+    groups = [];
+    for (let i = 0; i < entries.length; i += groupSize) {
+      const chunk = entries.slice(i, i + groupSize);
+      const label = chunk.length === 1 ? chunk[0].label : `${chunk[0].label}–${chunk[chunk.length - 1].label}`;
+      const content = chunk.length === 1 ? chunk[0].content : chunk.map((c) => `**${c.label}**\n${c.content}`).join("\n\n");
+      groups.push({ label, content });
+    }
+  }
+
+  return (
+    <div>
+      {groups.map((g, i) => {
+        const isOpen = i === openIndex;
+        return (
+          <div key={i} style={{ border: `1px solid ${C.border}`, borderRadius: "10px", marginBottom: "8px", overflow: "hidden" }}>
+            <button onClick={() => onToggle(isOpen ? -1 : i)} style={{
+              width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "13px 16px", background: isOpen ? C.driftLight : C.surface, border: "none", cursor: "pointer",
+              fontFamily: font.display, fontWeight: 700, fontSize: "14px", color: C.drift, textAlign: "left",
+            }}>
+              <span>{g.label}</span>
+              <span style={{ fontSize: "11px", color: C.muted }}>{isOpen ? "▲" : "▼"}</span>
+            </button>
+            {isOpen && (
+              <div style={{ padding: "14px 16px 16px", fontSize: "13.5px", lineHeight: "1.8", color: C.textMid, fontFamily: font.body, background: C.surface }}>
+                {renderMarkdown(g.content)}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export default function App() {
   const [step, setStep] = useState(0);
   const [showLanding, setShowLanding] = useState(true);
@@ -479,6 +534,7 @@ const [reviewRating, setReviewRating] = useState(0);
 const [reviewComment, setReviewComment] = useState("");
 const [reviewSent, setReviewSent] = useState(false);
 const [shareCopied, setShareCopied] = useState(false);
+const [openDayIndex, setOpenDayIndex] = useState(0);
   useEffect(() => {
   const params = new URLSearchParams(window.location.search);
   if (params.get("paid") === "true") {
@@ -603,7 +659,7 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
   const generateFull = async () => {
   setLoadingStage("call1");
   const p = personality || { name: "The Savvy Explorer", desc: "" };
-  const isLong = Number(effectiveDuration) > 21;
+  const isLong = Number(effectiveDuration) > 20;
   const prompt = `You are an expert backpacker travel planner. Continue planning this trip in detail.
 
 TRAVELLER PROFILE:
@@ -630,9 +686,9 @@ Respond with EXACTLY these sections, each kept concise:
 
 ${isLong
   ? `## Trip Breakdown
-This is a longer trip (${effectiveDuration} days). Structure as phases covering roughly 2 weeks each — for a 90 day trip this means about 6 phases total, not one per week. Keep each phase to 4-5 sentences maximum, no exceptions. Pace note: ${form.pace === "fast_packed" ? "move to a new location every 2-3 days within each phase" : form.pace === "slow_deep" ? "settle into 1-2 base locations per phase, minimal moving" : "a balanced mix of settling in and moving on"}.`
+This is a longer trip (${effectiveDuration} days). Structure as phases covering roughly 2 weeks each — for a 90 day trip this means about 6 phases total, not one per week. Use the exact format "### Phase N" (e.g. "### Phase 1") as a header immediately before each phase's content — this exact format is required so the app can display each phase separately. Keep each phase to 4-5 sentences maximum, no exceptions. Pace note: ${form.pace === "fast_packed" ? "move to a new location every 2-3 days within each phase" : form.pace === "slow_deep" ? "settle into 1-2 base locations per phase, minimal moving" : "a balanced mix of settling in and moving on"}.`
   : `## Day-by-Day Breakdown
-Days 2 onwards. Each day: Morning/Afternoon/Evening as short bullets. One restaurant tip per day. Keep each day tight — no more than 5 bullet points total. Pace note: ${form.pace === "fast_packed" ? "change location every 2-3 days, don't linger" : form.pace === "slow_deep" ? "stay in 1-2 places for most of the trip, deep not wide" : "moderate movement between locations"}.`
+Days 2 onwards. Use the exact format "### Day N" (e.g. "### Day 2") as a header immediately before each day's content — this exact format is required so the app can display each day separately. Each day: Morning/Afternoon/Evening as short bullets. One restaurant tip per day. Keep each day tight — no more than 5 bullet points total. Pace note: ${form.pace === "fast_packed" ? "change location every 2-3 days, don't linger" : form.pace === "slow_deep" ? "stay in 1-2 places for most of the trip, deep not wide" : "moderate movement between locations"}.`
 }
 
 ## Season & Timing
@@ -683,6 +739,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setReviewRating(0);
     setReviewComment("");
     setReviewSent(false);
+    setOpenDayIndex(0);
   };
 
   const sendReview = () => {
@@ -916,7 +973,11 @@ const renderVibeQuiz = () => {
         <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "16px" }}>
           {parseOutput(fullResult1).map((s, i) => (
             <OutputSection key={s.id} emoji={s.emoji} title={s.title} last={i === parseOutput(fullResult1).length - 1}>
-              <div style={{ fontSize: "14px", lineHeight: "1.85", color: C.textMid, fontFamily: font.body }}>{renderMarkdown(s.body)}</div>
+              {(s.title === "Day-by-Day" || s.title === "Trip Breakdown") ? (
+                <DayAccordion body={s.body} openIndex={openDayIndex} onToggle={setOpenDayIndex} />
+              ) : (
+                <div style={{ fontSize: "14px", lineHeight: "1.85", color: C.textMid, fontFamily: font.body }}>{renderMarkdown(s.body)}</div>
+              )}
               {s.title === "Where to Stay" && (
                 <div style={{ marginTop: "14px" }}>
                   <a href={buildBookingLink()} target="_blank" rel="noopener noreferrer sponsored" style={{
