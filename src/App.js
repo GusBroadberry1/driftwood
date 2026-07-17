@@ -572,6 +572,10 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}, [step, vibeQ, previewResult, showLanding]);
+
+useEffect(() => {
   if (session && unlocked && fullResult1 && !tripSaved) {
     saveCurrentTrip();
   }
