@@ -1127,7 +1127,7 @@ const renderVibeQuiz = () => {
               <div style={{ fontSize: "13px", color: C.drift, fontFamily: font.body, fontWeight: 600, marginBottom: "12px" }}>
                 📧 Check your email for a 6-digit code
               </div>
-              <TextInput placeholder="482913" type="text" value={otpCode} onChange={setOtpCode} />
+              <TextInput placeholder="Enter the code from your email" type="text" value={otpCode} onChange={setOtpCode} />
               <button onClick={verifyLoginCode} disabled={!otpCode || verifyingOtp} style={{
                 width: "100%", marginTop: "10px",
                 background: otpCode ? `linear-gradient(135deg, ${C.drift}, ${C.driftMid})` : C.surfaceAlt,
