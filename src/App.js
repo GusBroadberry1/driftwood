@@ -539,6 +539,8 @@ const [openDayIndex, setOpenDayIndex] = useState(0);
 const [session, setSession] = useState(null);
 const [saveEmail, setSaveEmail] = useState("");
 const [magicLinkSent, setMagicLinkSent] = useState(false);
+const [otpCode, setOtpCode] = useState("");
+const [verifyingOtp, setVerifyingOtp] = useState(false);
 const [tripSaved, setTripSaved] = useState(false);
 const [showMyTrips, setShowMyTrips] = useState(false);
 const [myTrips, setMyTrips] = useState([]);
@@ -769,6 +771,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setTripSaved(false);
     setMagicLinkSent(false);
     setSaveEmail("");
+    setOtpCode("");
   };
 
   const sendReview = () => {
@@ -804,7 +807,25 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
       if (error) throw error;
       setMagicLinkSent(true);
     } catch (e) {
-      setError("Could not send login link: " + e.message);
+      setError("Could not send login code: " + e.message);
+    }
+  };
+
+  const verifyLoginCode = async () => {
+    setVerifyingOtp(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email: saveEmail,
+        token: otpCode,
+        type: "email",
+      });
+      if (error) throw error;
+      // onAuthStateChange picks up the new session automatically
+    } catch (e) {
+      setError("That code didn't work: " + e.message);
+    } finally {
+      setVerifyingOtp(false);
     }
   };
 
@@ -1102,9 +1123,24 @@ const renderVibeQuiz = () => {
               {tripSaved ? `💾 Saved to ${session.user.email}` : "Saving your trip…"}
             </div>
           ) : magicLinkSent ? (
-            <div style={{ fontSize: "13px", color: C.drift, fontFamily: font.body, fontWeight: 600 }}>
-              📧 Check your email for a login link!
-            </div>
+            <>
+              <div style={{ fontSize: "13px", color: C.drift, fontFamily: font.body, fontWeight: 600, marginBottom: "12px" }}>
+                📧 Check your email for a 6-digit code
+              </div>
+              <TextInput placeholder="482913" type="text" value={otpCode} onChange={setOtpCode} />
+              <button onClick={verifyLoginCode} disabled={!otpCode || verifyingOtp} style={{
+                width: "100%", marginTop: "10px",
+                background: otpCode ? `linear-gradient(135deg, ${C.drift}, ${C.driftMid})` : C.surfaceAlt,
+                border: "none", color: otpCode ? "#fff" : C.muted, borderRadius: "10px",
+                padding: "12px", fontSize: "14px", fontWeight: 600, fontFamily: font.body,
+                cursor: otpCode ? "pointer" : "not-allowed",
+              }}>
+                {verifyingOtp ? "Checking…" : "Confirm Code"}
+              </button>
+              {error && (
+                <div style={{ fontSize: "12px", color: C.error, fontFamily: font.body, marginTop: "10px" }}>{error}</div>
+              )}
+            </>
           ) : (
             <>
               <div style={{ fontSize: "14px", fontWeight: 600, color: C.text, fontFamily: font.body, marginBottom: "12px" }}>
@@ -1118,7 +1154,7 @@ const renderVibeQuiz = () => {
                 padding: "12px", fontSize: "14px", fontWeight: 600, fontFamily: font.body,
                 cursor: saveEmail ? "pointer" : "not-allowed",
               }}>
-                Send Login Link
+                Send Login Code
               </button>
             </>
           )}
