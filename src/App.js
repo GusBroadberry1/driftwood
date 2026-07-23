@@ -694,6 +694,7 @@ TRAVELLER PROFILE:
 - Travel Personality: ${p.name}
 - Destination: ${form.destination}
 - Duration: ${effectiveDuration} days
+- Daily Budget: £${form.budget}/day GBP
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
 - Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
 - Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}
@@ -710,7 +711,7 @@ Respond with EXACTLY these sections, each kept concise:
 3 standout highlights, one line each.
 
 ## Accommodation
-1 specific hostel/stay per main location, with nightly cost and one line of context.
+1 specific hostel/stay per main location, with nightly cost and one line of context. The nightly cost must realistically fit the traveller's stated daily budget of £${form.budget}/day — this is a hard constraint and takes priority over the stated accommodation style (${accomOptions.find((o) => o.value === form.accom)?.label}) if the two conflict. If the budget can't realistically support that accommodation style in this destination, say so honestly in one line and suggest the closest realistic option within budget, rather than silently ignoring the budget or the style.
 
 ${isLong
   ? `## Trip Breakdown
