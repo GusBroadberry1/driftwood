@@ -30,10 +30,9 @@ const font = {
 
 const TOTAL_STEPS = 4;
 
-// TODO: replace with your real Booking.com affiliate ID once your Partner Programme
-// application (partnerships.booking.com) is approved. Using a placeholder for now
-// means the link still works, it just won't be tracked as your referral yet.
-const BOOKING_AFFILIATE_ID = "YOUR_BOOKING_AID";
+// Real CJ Affiliate tracking link for Booking.com UK, approved 25 July 2026.
+// Deep-link enabled -- a destination URL can be appended via the ?url= parameter.
+const CJ_BOOKING_LINK_BASE = "https://www.jdoqocy.com/click-101823369-15734754";
 
 const GOOGLE_REVIEW_LINK = "https://g.page/r/CXlzqccweCGHEAE/review";
 
@@ -607,8 +606,8 @@ useEffect(() => {
       params.set("checkout", checkoutDate.toISOString().split("T")[0]);
     }
     params.set("group_adults", "1");
-    params.set("aid", BOOKING_AFFILIATE_ID);
-    return `https://www.booking.com/searchresults.html?${params.toString()}`;
+    const bookingSearchUrl = `https://www.booking.com/searchresults.html?${params.toString()}`;
+    return `${CJ_BOOKING_LINK_BASE}?url=${encodeURIComponent(bookingSearchUrl)}`;
   };
 
   const callAI = async (prompt, isLong = false, kind = "preview", sessionId = null) => {
