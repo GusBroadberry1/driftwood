@@ -545,6 +545,7 @@ const [tripSaved, setTripSaved] = useState(false);
 const [showMyTrips, setShowMyTrips] = useState(false);
 const [myTrips, setMyTrips] = useState([]);
 const [tripsLoading, setTripsLoading] = useState(false);
+const [paidSessionId, setPaidSessionId] = useState(null);
   useEffect(() => {
   const params = new URLSearchParams(window.location.search);
   if (params.get("paid") === "true") {
@@ -555,6 +556,7 @@ const [tripsLoading, setTripsLoading] = useState(false);
       setPreviewResult(savedPreview);
       setShowLanding(false);
       setLoadingStage("call1");
+      setPaidSessionId(params.get("session_id"));
       window.history.replaceState({}, "", window.location.pathname);
     }
   }
@@ -609,13 +611,16 @@ useEffect(() => {
     return `https://www.booking.com/searchresults.html?${params.toString()}`;
   };
 
-  const callAI = async (prompt, isLong = false) => {
+  const callAI = async (prompt, isLong = false, kind = "preview", sessionId = null) => {
   const res = await fetch("/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt, isLong }),
+    body: JSON.stringify({ prompt, isLong, kind, sessionId }),
   });
   const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Something went wrong generating this part — please try again.");
+  }
   const text = data.content?.map((b) => b.text || "").join("\n") || "";
   return text || "Something went wrong generating this part — please try again.";
 };
@@ -747,7 +752,7 @@ A tight, scannable checklist of 5 final things to confirm before departure (visa
 Write like a well-travelled friend. Be concise and specific — bullet points, not paragraphs. Total response under 1600 words.`;
 
   try {
-    const text = await callAI(prompt);
+    const text = await callAI(prompt, isLong, "full", paidSessionId);
     setFullResult1(text);
     setUnlocked(true);
   } catch (err) {
@@ -773,6 +778,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setMagicLinkSent(false);
     setSaveEmail("");
     setOtpCode("");
+    setPaidSessionId(null);
   };
 
   const sendReview = () => {
