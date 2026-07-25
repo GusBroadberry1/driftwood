@@ -32,7 +32,9 @@ module.exports = async function handler(req, res) {
       ],
       mode: "payment",
       allow_promotion_codes: true,
-      success_url: `${req.headers.origin}/?paid=true`,
+      // {CHECKOUT_SESSION_ID} is a literal placeholder Stripe fills in automatically
+      // once payment completes -- this is how the app later proves a real payment happened.
+      success_url: `${req.headers.origin}/?paid=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.origin}/?paid=false`,
     });
 
