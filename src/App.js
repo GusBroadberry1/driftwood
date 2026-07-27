@@ -605,7 +605,7 @@ useEffect(() => {
   const effectiveDuration = form.duration === "custom" ? form.customDuration : form.duration;
   const startDateIsValid = form.startDate && form.startDate >= toLocalYMD(new Date());
   const effectiveStartDate = startDateIsValid ? form.startDate : "";
-  const canGenerate = form.destination && form.duration && (form.duration !== "custom" || form.customDuration) && form.budget && form.accom && form.pace && form.interests.length >= 1;
+  const canGenerate = form.duration && (form.duration !== "custom" || form.customDuration) && form.budget && form.accom && form.pace && form.interests.length >= 1;
 
   const buildBookingLink = () => {
     const params = new URLSearchParams();
@@ -644,7 +644,7 @@ const generatePreview = async () => {
 
 TRAVELLER PROFILE:
 - Travel Personality: ${p.name} — ${p.desc}
-- Destination: ${form.destination}
+- Destination: ${form.destination || `Not specified — choose a destination that genuinely fits this traveller's personality, interests, budget, avoids and pace below. Before anything else, on its own line with nothing else on it, output exactly: DESTINATION: <Your Chosen Place>`}
 - Duration: ${effectiveDuration} days
 - Daily Budget: £${form.budget}/day GBP
 - Travel Dates: ${effectiveStartDate || "Flexible"}
@@ -665,7 +665,14 @@ Morning / Afternoon / Evening for day one only, matched to their interests. Shor
 Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
 
   try {
-    const text = await callAI(prompt);
+    let text = await callAI(prompt);
+    if (!form.destination) {
+      const match = text.match(/^DESTINATION:\s*(.+)$/m);
+      if (match) {
+        setField("destination", match[1].trim());
+        text = text.replace(match[0], "").trim();
+      }
+    }
     setPreviewResult(text);
   } catch {
     setError("Something went wrong. Please try again.");
@@ -708,7 +715,7 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
 
 TRAVELLER PROFILE:
 - Travel Personality: ${p.name}
-- Destination: ${form.destination}
+- Destination: ${form.destination || "Not specified — continue with whichever destination fits this traveller's profile best, and state it clearly at the start of your response."}
 - Duration: ${effectiveDuration} days
 - Daily Budget: £${form.budget}/day GBP
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
@@ -982,8 +989,8 @@ const renderVibeQuiz = () => {
       <h2 style={{ fontFamily: font.display, fontSize: "24px", color: C.text, margin: "0 0 4px", fontWeight: 600 }}>Trip details</h2>
       <p style={{ color: C.muted, fontSize: "13px", fontFamily: font.body, margin: "0 0 28px" }}>Where are you headed and when?</p>
       <div style={{ marginBottom: "22px" }}>
-        <Label hint="Country, region, or city — as specific as you like">Destination</Label>
-        <TextInput placeholder="e.g. Southern Thailand, Bali, Colombia" value={form.destination} onChange={(v) => setField("destination", v)} />
+        <Label hint="Country, region, or city — or leave blank and we'll pick somewhere that fits you">Destination (optional)</Label>
+        <TextInput placeholder="e.g. Southern Thailand, Bali, Colombia — or leave blank to surprise me" value={form.destination} onChange={(v) => setField("destination", v)} />
       </div>
       <div style={{ marginBottom: "22px" }}>
   <Label>How long is the trip?</Label>
@@ -1016,7 +1023,7 @@ const renderVibeQuiz = () => {
         <Label hint="Used to estimate flight costs">Departure airport or region</Label>
         <TextInput placeholder="e.g. Manchester, London Gatwick" value={form.departure} onChange={(v) => setField("departure", v)} />
       </div>
-      <NavButtons onBack={() => { setStep(0); setVibeQ(vibeQuestions.length - 1); }} onNext={() => setStep(2)} nextDisabled={!form.destination || !form.duration || (form.duration === "custom" && !form.customDuration) || !form.budget} />
+      <NavButtons onBack={() => { setStep(0); setVibeQ(vibeQuestions.length - 1); }} onNext={() => setStep(2)} nextDisabled={!form.duration || (form.duration === "custom" && !form.customDuration) || !form.budget || !form.departure} />
     </div>
   );
 
