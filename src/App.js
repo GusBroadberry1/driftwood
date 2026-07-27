@@ -989,8 +989,8 @@ const renderVibeQuiz = () => {
       <h2 style={{ fontFamily: font.display, fontSize: "24px", color: C.text, margin: "0 0 4px", fontWeight: 600 }}>Trip details</h2>
       <p style={{ color: C.muted, fontSize: "13px", fontFamily: font.body, margin: "0 0 28px" }}>Where are you headed and when?</p>
       <div style={{ marginBottom: "22px" }}>
-        <Label hint="Country, region, or city — or leave blank and we'll pick somewhere that fits you">Destination (optional)</Label>
-        <TextInput placeholder="e.g. Southern Thailand, Bali, Colombia — or leave blank to surprise me" value={form.destination} onChange={(v) => setField("destination", v)} />
+        <Label hint="Country, region, or city — or leave blank for a surprise trip">Destination (optional)</Label>
+        <TextInput placeholder="e.g. Southern Thailand, Bali, Colombia — or leave blank for a surprise trip" value={form.destination} onChange={(v) => setField("destination", v)} />
       </div>
       <div style={{ marginBottom: "22px" }}>
   <Label>How long is the trip?</Label>
