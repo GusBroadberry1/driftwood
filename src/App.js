@@ -30,6 +30,16 @@ const font = {
 
 const TOTAL_STEPS = 4;
 
+// Returns YYYY-MM-DD using the browser's LOCAL date, avoiding the
+// off-by-one-day bug that toISOString() causes near midnight in timezones
+// ahead of UTC (like the UK during BST).
+const toLocalYMD = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
 // Real CJ Affiliate tracking link for Booking.com UK, approved 25 July 2026.
 // Deep-link enabled -- a destination URL can be appended via the ?url= parameter.
 const CJ_BOOKING_LINK_BASE = "https://www.jdoqocy.com/click-101823369-15734754";
@@ -598,13 +608,13 @@ useEffect(() => {
   const buildBookingLink = () => {
     const params = new URLSearchParams();
     if (form.destination) params.set("ss", form.destination);
-    const startDateIsFuture = form.startDate && new Date(form.startDate) >= new Date(new Date().toDateString());
+    const startDateIsFuture = form.startDate && form.startDate >= toLocalYMD(new Date());
     if (startDateIsFuture) {
       params.set("checkin", form.startDate);
       const checkoutDate = new Date(form.startDate);
       const nights = Number(effectiveDuration) || 7;
       checkoutDate.setDate(checkoutDate.getDate() + nights);
-      params.set("checkout", checkoutDate.toISOString().split("T")[0]);
+      params.set("checkout", toLocalYMD(checkoutDate));
     }
     params.set("group_adults", "1");
     const bookingSearchUrl = `https://www.booking.com/searchresults.html?${params.toString()}`;
@@ -990,7 +1000,7 @@ const renderVibeQuiz = () => {
 
       <div style={{ marginBottom: "22px" }}>
         <Label hint="Used to flag weather, crowds and seasonal alerts">Approximate start date</Label>
-        <TextInput type="date" value={form.startDate} onChange={(v) => setField("startDate", v)} min={new Date().toISOString().split("T")[0]} />
+        <TextInput type="date" value={form.startDate} onChange={(v) => setField("startDate", v)} min={toLocalYMD(new Date())} />
       </div>
       <div style={{ marginBottom: "22px" }}>
         <Label>Who's travelling?</Label>
