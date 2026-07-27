@@ -117,6 +117,7 @@ const accomOptions = [
   { value: "party_hostel", label: "Party Hostel", desc: "8–16 bed, events every night", icon: "🎉" },
   { value: "mixed", label: "Flexible", desc: "Dorms on transit nights, private when resting", icon: "⚖️" },
   { value: "comfort_hotels", label: "Comfort & Hotels", desc: "Private hotels, more comfort, less hostel-hopping", icon: "🛎️" },
+  { value: "apartment_villa", label: "Apartment & Villa", desc: "Self-catering, more space, great for groups", icon: "🏡" },
 ];
 
 const paceOptions = [
@@ -1155,7 +1156,7 @@ const renderVibeQuiz = () => {
           ) : magicLinkSent ? (
             <>
               <div style={{ fontSize: "13px", color: C.drift, fontFamily: font.body, fontWeight: 600, marginBottom: "12px" }}>
-                📧 Check your email for a 6-digit code
+                📧 Check your email for a login code
               </div>
               <TextInput placeholder="Enter the code from your email" type="text" value={otpCode} onChange={setOtpCode} />
               <button onClick={verifyLoginCode} disabled={!otpCode || verifyingOtp} style={{
