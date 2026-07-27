@@ -242,10 +242,10 @@ const Label = ({ children, hint }) => (
   </div>
 );
 
-const TextInput = ({ placeholder, value, onChange, type = "text" }) => {
+const TextInput = ({ placeholder, value, onChange, type = "text", min }) => {
   const [focused, setFocused] = useState(false);
   return (
-    <input type={type} placeholder={placeholder} value={value}
+    <input type={type} placeholder={placeholder} value={value} min={min}
       onChange={(e) => onChange(e.target.value)}
       onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
       style={{
@@ -598,7 +598,8 @@ useEffect(() => {
   const buildBookingLink = () => {
     const params = new URLSearchParams();
     if (form.destination) params.set("ss", form.destination);
-    if (form.startDate) {
+    const startDateIsFuture = form.startDate && new Date(form.startDate) >= new Date(new Date().toDateString());
+    if (startDateIsFuture) {
       params.set("checkin", form.startDate);
       const checkoutDate = new Date(form.startDate);
       const nights = Number(effectiveDuration) || 7;
@@ -989,7 +990,7 @@ const renderVibeQuiz = () => {
 
       <div style={{ marginBottom: "22px" }}>
         <Label hint="Used to flag weather, crowds and seasonal alerts">Approximate start date</Label>
-        <TextInput type="date" value={form.startDate} onChange={(v) => setField("startDate", v)} />
+        <TextInput type="date" value={form.startDate} onChange={(v) => setField("startDate", v)} min={new Date().toISOString().split("T")[0]} />
       </div>
       <div style={{ marginBottom: "22px" }}>
         <Label>Who's travelling?</Label>
