@@ -603,15 +603,16 @@ useEffect(() => {
     }));
   const setField = (field, val) => setForm((f) => ({ ...f, [field]: val }));
   const effectiveDuration = form.duration === "custom" ? form.customDuration : form.duration;
+  const startDateIsValid = form.startDate && form.startDate >= toLocalYMD(new Date());
+  const effectiveStartDate = startDateIsValid ? form.startDate : "";
   const canGenerate = form.destination && form.duration && (form.duration !== "custom" || form.customDuration) && form.budget && form.accom && form.pace && form.interests.length >= 1;
 
   const buildBookingLink = () => {
     const params = new URLSearchParams();
     if (form.destination) params.set("ss", form.destination);
-    const startDateIsFuture = form.startDate && form.startDate >= toLocalYMD(new Date());
-    if (startDateIsFuture) {
-      params.set("checkin", form.startDate);
-      const checkoutDate = new Date(form.startDate);
+    if (effectiveStartDate) {
+      params.set("checkin", effectiveStartDate);
+      const checkoutDate = new Date(effectiveStartDate);
       const nights = Number(effectiveDuration) || 7;
       checkoutDate.setDate(checkoutDate.getDate() + nights);
       params.set("checkout", toLocalYMD(checkoutDate));
@@ -646,7 +647,7 @@ TRAVELLER PROFILE:
 - Destination: ${form.destination}
 - Duration: ${effectiveDuration} days
 - Daily Budget: £${form.budget}/day GBP
-- Travel Dates: ${form.startDate || "Flexible"}
+- Travel Dates: ${effectiveStartDate || "Flexible"}
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
 - Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
 - Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}
@@ -717,7 +718,7 @@ TRAVELLER PROFILE:
 - Interests: ${form.interests.join(", ")}
 - Avoid: ${form.avoids.length ? form.avoids.join(", ") : "Nothing specified"}
 - Notes: ${form.notes || "None"}
-- Travel Dates: ${form.startDate || "Flexible"}
+- Travel Dates: ${effectiveStartDate || "Flexible"}
 - Departure location: ${form.departure || "UK"}
 
 Respond with EXACTLY these sections, each kept concise:
@@ -1001,6 +1002,11 @@ const renderVibeQuiz = () => {
       <div style={{ marginBottom: "22px" }}>
         <Label hint="Used to flag weather, crowds and seasonal alerts">Approximate start date</Label>
         <TextInput type="date" value={form.startDate} onChange={(v) => setField("startDate", v)} min={toLocalYMD(new Date())} />
+        {form.startDate && !startDateIsValid && (
+          <div style={{ fontSize: "12px", color: C.warning, marginTop: "6px", fontFamily: font.body }}>
+            That date's in the past — we'll plan this trip as flexible/undated instead.
+          </div>
+        )}
       </div>
       <div style={{ marginBottom: "22px" }}>
         <Label>Who's travelling?</Label>
