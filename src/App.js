@@ -1002,7 +1002,7 @@ const renderVibeQuiz = () => {
   )}
 </div>
 <div style={{ marginBottom: "22px" }}>
-  <Label>Daily Budget (£)</Label>
+  <Label hint="Covers accommodation, food, transport and activities — not flights">Daily Budget (£)</Label>
   <TextInput type="number" placeholder="e.g. 40" value={form.budget} onChange={(v) => setField("budget", v)} />
 </div>
 
