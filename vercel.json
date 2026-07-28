@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/generate.js": {
-      "maxDuration": 60
+      "maxDuration": 120
     },
     "api/create-checkout.js": {
       "maxDuration": 60
