@@ -549,8 +549,32 @@ const [paidSessionId, setPaidSessionId] = useState(null);
 const [pdfEmail, setPdfEmail] = useState("");
 const [pdfSending, setPdfSending] = useState(false);
 const [pdfSent, setPdfSent] = useState(false);
+const [savedTripId, setSavedTripId] = useState(null);
   useEffect(() => {
   const params = new URLSearchParams(window.location.search);
+  const tripParam = params.get("trip");
+  if (tripParam) {
+    fetch(`/api/get-trip?id=${encodeURIComponent(tripParam)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((tripData) => {
+        if (tripData) {
+          if (tripData.form) setForm(tripData.form);
+          setPreviewResult(tripData.previewText || null);
+          setFullResult1(tripData.fullText || null);
+          setUnlocked(true);
+          setShowLanding(false);
+          setSavedTripId(tripParam);
+        } else {
+          setError("This itinerary link couldn't be found — it may have expired or been mistyped.");
+        }
+        window.history.replaceState({}, "", window.location.pathname);
+      })
+      .catch(() => {
+        setError("Couldn't load that itinerary right now. Please try again.");
+        window.history.replaceState({}, "", window.location.pathname);
+      });
+    return;
+  }
   if (params.get("paid") === "true") {
     const savedForm = localStorage.getItem("driftwoodForm");
     const savedPreview = localStorage.getItem("driftwoodPreview");
@@ -602,18 +626,18 @@ useEffect(() => {
     return `${CJ_BOOKING_LINK_BASE}?url=${encodeURIComponent(bookingSearchUrl)}`;
   };
 
-  const callAI = async (prompt, isLong = false, kind = "preview", sessionId = null) => {
+  const callAI = async (prompt, isLong = false, kind = "preview", sessionId = null, extra = {}) => {
   const res = await fetch("/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt, isLong, kind, sessionId }),
+    body: JSON.stringify({ prompt, isLong, kind, sessionId, ...extra }),
   });
   const data = await res.json();
   if (!res.ok) {
     throw new Error(data.error || "Something went wrong generating this part — please try again.");
   }
   const text = data.content?.map((b) => b.text || "").join("\n") || "";
-  return text || "Something went wrong generating this part — please try again.";
+  return { text: text || "Something went wrong generating this part — please try again.", tripId: data.driftwoodTripId || null };
 };
 
 const generatePreview = async () => {
@@ -645,7 +669,7 @@ Morning / Afternoon / Evening for day one only, matched to their interests. Shor
 Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
 
   try {
-    let text = await callAI(prompt);
+    let { text } = await callAI(prompt);
     if (!form.destination) {
       const match = text.match(/^DESTINATION:\s*(.+)$/m);
       if (match) {
@@ -750,9 +774,17 @@ A tight, scannable checklist of 5 final things to confirm before departure (visa
 Write like a well-travelled friend. Be concise and specific — bullet points, not paragraphs. Total response under 1600 words.`;
 
   try {
-    const text = await callAI(prompt, isLong, "full", paidSessionId);
+    const { text, tripId } = await callAI(prompt, isLong, "full", paidSessionId, {
+      destination: form.destination,
+      duration: effectiveDuration,
+      budget: form.budget,
+      personality: p.name,
+      previewText: previewResult,
+      form: form,
+    });
     setFullResult1(text);
     setUnlocked(true);
+    if (tripId) setSavedTripId(tripId);
   } catch (err) {
     setError("Something went wrong: " + err.message);
   } finally {
@@ -776,6 +808,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setPdfSending(false);
     setPdfSent(false);
     setPaidSessionId(null);
+    setSavedTripId(null);
   };
 
   const sendReview = () => {
@@ -802,6 +835,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
           personality: personality?.name,
           previewText: previewResult,
           fullText: fullResult1,
+          tripId: savedTripId,
         }),
       });
       const data = await res.json();
@@ -1069,6 +1103,20 @@ const renderVibeQuiz = () => {
                   }}>
                     ✈️ Search flights on Skyscanner →
                   </a>
+                </div>
+              )}
+              {s.title === "Top Picks" && (
+                <div style={{ marginTop: "14px" }}>
+                  <a href="https://www.getyourguide.com?partner_id=NAMQ8MQ&cmp=share_to_earn" target="_blank" rel="noopener noreferrer sponsored" style={{
+                    display: "inline-block", background: C.driftLight, border: `1.5px solid ${C.borderDark}`,
+                    borderRadius: "10px", padding: "10px 16px", fontSize: "13px", fontWeight: 600,
+                    fontFamily: font.body, color: C.drift, textDecoration: "none",
+                  }}>
+                    🎟 Book activities & tours on GetYourGuide →
+                  </a>
+                  <div style={{ fontSize: "11px", color: C.muted, fontFamily: font.body, marginTop: "6px" }}>
+                    We may earn a small commission if you book through this link, at no extra cost to you.
+                  </div>
                 </div>
               )}
             </OutputSection>
