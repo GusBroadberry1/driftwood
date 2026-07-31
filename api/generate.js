@@ -81,7 +81,7 @@ module.exports = async function handler(req, res) {
       // revisit the live, interactive itinerary later via a private link ---
       try {
         tripId = crypto.randomBytes(9).toString("base64url");
-        await supabaseAdmin.from("shared_trips").insert({
+        const { error: insertError } = await supabaseAdmin.from("shared_trips").insert({
           id: tripId,
           destination,
           duration: String(duration || ""),
@@ -91,6 +91,10 @@ module.exports = async function handler(req, res) {
           preview_text: previewText,
           full_text: fullText,
         });
+        if (insertError) {
+          console.error("Saving shared trip failed:", insertError.message);
+          tripId = null;
+        }
       } catch (saveErr) {
         console.error("Saving shared trip failed:", saveErr.message);
         tripId = null;
