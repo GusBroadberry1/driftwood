@@ -1,5 +1,7 @@
 const Stripe = require("stripe");
+const crypto = require("crypto");
 const { createClient } = require("@supabase/supabase-js");
+const { buildItineraryPdf, sendItineraryPdfEmail } = require("./_lib/pdfEmail");
 
 const supabaseAdmin = createClient(
   "https://woxnkxvryjbrejsojgsm.supabase.co",
@@ -15,7 +17,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { prompt, isLong, kind, sessionId } = req.body;
+    const { prompt, isLong, kind, sessionId, destination, duration, budget, personality, previewText, form } = req.body;
 
     // --- Rate limiting: stop any single IP from spamming generations ---
     const ip =
@@ -40,13 +42,14 @@ module.exports = async function handler(req, res) {
     supabaseAdmin.from("rate_limits").insert({ ip }).then(() => {}, () => {});
 
     // --- Payment verification: only for the full (paid) itinerary ---
+    let stripeSession = null;
     if (kind === "full") {
       if (!sessionId) {
         return res.status(402).json({ error: "Payment verification required." });
       }
       const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-      const session = await stripe.checkout.sessions.retrieve(sessionId);
-      if (!session || session.payment_status !== "paid") {
+      stripeSession = await stripe.checkout.sessions.retrieve(sessionId);
+      if (!stripeSession || stripeSession.payment_status !== "paid") {
         return res.status(402).json({ error: "Payment could not be verified for this session." });
       }
     }
@@ -68,7 +71,50 @@ module.exports = async function handler(req, res) {
 
     const data = await response.json();
     console.log("Anthropic response:", JSON.stringify(data));
-    res.status(200).json(data);
+
+    let tripId = null;
+
+    if (kind === "full" && stripeSession) {
+      const fullText = data.content?.map((b) => b.text || "").join("\n") || "";
+
+      // --- Save the trip under a random, unguessable ID so the person can
+      // revisit the live, interactive itinerary later via a private link ---
+      try {
+        tripId = crypto.randomBytes(9).toString("base64url");
+        await supabaseAdmin.from("shared_trips").insert({
+          id: tripId,
+          destination,
+          duration: String(duration || ""),
+          budget: String(budget || ""),
+          personality,
+          form: form || null,
+          preview_text: previewText,
+          full_text: fullText,
+        });
+      } catch (saveErr) {
+        console.error("Saving shared trip failed:", saveErr.message);
+        tripId = null;
+      }
+
+      // --- Auto-email a PDF copy (+ the live link, if saving worked) using
+      // the email Stripe collected at checkout. This means the itinerary is
+      // safely delivered even if the person closes the tab right after
+      // paying, without needing any login/account system. ---
+      const customerEmail = stripeSession.customer_details?.email || stripeSession.customer_email;
+      if (customerEmail) {
+        try {
+          const pdfBuffer = await buildItineraryPdf({ destination, duration, budget, personality, previewText, fullText });
+          const tripLink = tripId ? `https://driftwoodtravel.co/?trip=${tripId}` : null;
+          await sendItineraryPdfEmail({ email: customerEmail, destination, pdfBuffer, tripLink });
+        } catch (emailErr) {
+          // Don't fail the main response just because the auto-email failed --
+          // the person can still use the in-app "Email My Itinerary" option.
+          console.error("Auto-send PDF email failed:", emailErr.message);
+        }
+      }
+    }
+
+    res.status(200).json({ ...data, driftwoodTripId: tripId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
