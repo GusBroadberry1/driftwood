@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from "./supabaseClient";
 
 
 // ─── DRIFTWOOD BRAND TOKENS ───────────────────────────────
@@ -546,16 +545,10 @@ const [reviewComment, setReviewComment] = useState("");
 const [reviewSent, setReviewSent] = useState(false);
 const [shareCopied, setShareCopied] = useState(false);
 const [openDayIndex, setOpenDayIndex] = useState(0);
-const [session, setSession] = useState(null);
-const [saveEmail, setSaveEmail] = useState("");
-const [magicLinkSent, setMagicLinkSent] = useState(false);
-const [otpCode, setOtpCode] = useState("");
-const [verifyingOtp, setVerifyingOtp] = useState(false);
-const [tripSaved, setTripSaved] = useState(false);
-const [showMyTrips, setShowMyTrips] = useState(false);
-const [myTrips, setMyTrips] = useState([]);
-const [tripsLoading, setTripsLoading] = useState(false);
 const [paidSessionId, setPaidSessionId] = useState(null);
+const [pdfEmail, setPdfEmail] = useState("");
+const [pdfSending, setPdfSending] = useState(false);
+const [pdfSent, setPdfSent] = useState(false);
   useEffect(() => {
   const params = new URLSearchParams(window.location.search);
   if (params.get("paid") === "true") {
@@ -578,22 +571,8 @@ useEffect(() => {
 }, [loadingStage, previewResult]);
 
 useEffect(() => {
-  supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
-  const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-    setSession(newSession);
-  });
-  return () => listener.subscription.unsubscribe();
-}, []);
-
-useEffect(() => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }, [step, vibeQ, previewResult, showLanding]);
-
-useEffect(() => {
-  if (session && unlocked && fullResult1 && !tripSaved) {
-    saveCurrentTrip();
-  }
-}, [session, unlocked, fullResult1, tripSaved]);
 
 
   const personality = Object.keys(vibeAnswers).length >= 3 ? derivePersonality(vibeAnswers) : null;
@@ -793,10 +772,9 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setReviewComment("");
     setReviewSent(false);
     setOpenDayIndex(0);
-    setTripSaved(false);
-    setMagicLinkSent(false);
-    setSaveEmail("");
-    setOtpCode("");
+    setPdfEmail("");
+    setPdfSending(false);
+    setPdfSent(false);
     setPaidSessionId(null);
   };
 
@@ -809,82 +787,31 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setReviewSent(true);
   };
 
-  const saveCurrentTrip = async () => {
-    try {
-      const { error } = await supabase.from("itineraries").insert({
-        user_id: session.user.id,
-        email: session.user.email,
-        destination: form.destination,
-        duration: String(effectiveDuration),
-        itinerary_data: { form, previewResult, fullResult1, personality },
-      });
-      if (!error) setTripSaved(true);
-    } catch (e) {
-      // saving is a bonus feature, not the critical path -- fail silently
-    }
-  };
-
-  const sendMagicLink = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: saveEmail,
-        options: { emailRedirectTo: window.location.origin },
-      });
-      if (error) throw error;
-      setMagicLinkSent(true);
-    } catch (e) {
-      setError("Could not send login code: " + e.message);
-    }
-  };
-
-  const verifyLoginCode = async () => {
-    setVerifyingOtp(true);
+  const sendItineraryPdf = async () => {
+    setPdfSending(true);
     setError(null);
     try {
-      const { error } = await supabase.auth.verifyOtp({
-        email: saveEmail,
-        token: otpCode,
-        type: "email",
+      const res = await fetch("/api/send-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: pdfEmail,
+          destination: form.destination,
+          duration: effectiveDuration,
+          budget: form.budget,
+          personality: personality?.name,
+          previewText: previewResult,
+          fullText: fullResult1,
+        }),
       });
-      if (error) throw error;
-      // onAuthStateChange picks up the new session automatically
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not send the email");
+      setPdfSent(true);
     } catch (e) {
-      setError("That code didn't work: " + e.message);
+      setError("Could not send your itinerary: " + e.message);
     } finally {
-      setVerifyingOtp(false);
+      setPdfSending(false);
     }
-  };
-
-  const loadMyTrips = async () => {
-    setTripsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("itineraries")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (!error) setMyTrips(data || []);
-    } catch (e) {
-      // ignore, list just stays empty
-    } finally {
-      setTripsLoading(false);
-    }
-  };
-
-  const openSavedTrip = (trip) => {
-    const d = trip.itinerary_data || {};
-    setForm(d.form || form);
-    setPreviewResult(d.previewResult || null);
-    setFullResult1(d.fullResult1 || null);
-    setUnlocked(true);
-    setShowLanding(false);
-    setShowMyTrips(false);
-    setTripSaved(true);
-  };
-
-  const signOutUser = async () => {
-    await supabase.auth.signOut();
-    setShowMyTrips(false);
-    setMyTrips([]);
   };
 
   const shareDriftwood = async () => {
@@ -1133,6 +1060,17 @@ const renderVibeQuiz = () => {
                   </div>
                 </div>
               )}
+              {s.title === "Flight Estimate" && (
+                <div style={{ marginTop: "14px" }}>
+                  <a href="https://www.skyscanner.net" target="_blank" rel="noopener noreferrer" style={{
+                    display: "inline-block", background: C.driftLight, border: `1.5px solid ${C.borderDark}`,
+                    borderRadius: "10px", padding: "10px 16px", fontSize: "13px", fontWeight: 600,
+                    fontFamily: font.body, color: C.drift, textDecoration: "none",
+                  }}>
+                    ✈️ Search flights on Skyscanner →
+                  </a>
+                </div>
+              )}
             </OutputSection>
           ))}
         </div>
@@ -1149,44 +1087,28 @@ const renderVibeQuiz = () => {
       )}
       {unlocked && (
         <div className="no-print" style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "20px", marginBottom: "20px", textAlign: "center" }}>
-          {session ? (
+          {pdfSent ? (
             <div style={{ fontSize: "13px", color: C.drift, fontFamily: font.body, fontWeight: 600 }}>
-              {tripSaved ? `💾 Saved to ${session.user.email}` : "Saving your trip…"}
+              📧 Sent! Check {pdfEmail} for your itinerary PDF.
             </div>
-          ) : magicLinkSent ? (
+          ) : (
             <>
-              <div style={{ fontSize: "13px", color: C.drift, fontFamily: font.body, fontWeight: 600, marginBottom: "12px" }}>
-                📧 Check your email for a login code
+              <div style={{ fontSize: "14px", fontWeight: 600, color: C.text, fontFamily: font.body, marginBottom: "12px" }}>
+                Want a copy? We'll email you the full itinerary as a PDF
               </div>
-              <TextInput placeholder="Enter the code from your email" type="text" value={otpCode} onChange={setOtpCode} />
-              <button onClick={verifyLoginCode} disabled={!otpCode || verifyingOtp} style={{
+              <TextInput placeholder="you@example.com" type="email" value={pdfEmail} onChange={setPdfEmail} />
+              <button onClick={sendItineraryPdf} disabled={!pdfEmail || pdfSending} style={{
                 width: "100%", marginTop: "10px",
-                background: otpCode ? `linear-gradient(135deg, ${C.drift}, ${C.driftMid})` : C.surfaceAlt,
-                border: "none", color: otpCode ? "#fff" : C.muted, borderRadius: "10px",
+                background: pdfEmail ? `linear-gradient(135deg, ${C.drift}, ${C.driftMid})` : C.surfaceAlt,
+                border: "none", color: pdfEmail ? "#fff" : C.muted, borderRadius: "10px",
                 padding: "12px", fontSize: "14px", fontWeight: 600, fontFamily: font.body,
-                cursor: otpCode ? "pointer" : "not-allowed",
+                cursor: pdfEmail ? "pointer" : "not-allowed",
               }}>
-                {verifyingOtp ? "Checking…" : "Confirm Code"}
+                {pdfSending ? "Sending…" : "Email My Itinerary"}
               </button>
               {error && (
                 <div style={{ fontSize: "12px", color: C.error, fontFamily: font.body, marginTop: "10px" }}>{error}</div>
               )}
-            </>
-          ) : (
-            <>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: C.text, fontFamily: font.body, marginBottom: "12px" }}>
-                Want to save this trip? Enter your email
-              </div>
-              <TextInput placeholder="you@example.com" type="email" value={saveEmail} onChange={setSaveEmail} />
-              <button onClick={sendMagicLink} disabled={!saveEmail} style={{
-                width: "100%", marginTop: "10px",
-                background: saveEmail ? `linear-gradient(135deg, ${C.drift}, ${C.driftMid})` : C.surfaceAlt,
-                border: "none", color: saveEmail ? "#fff" : C.muted, borderRadius: "10px",
-                padding: "12px", fontSize: "14px", fontWeight: 600, fontFamily: font.body,
-                cursor: saveEmail ? "pointer" : "not-allowed",
-              }}>
-                Send Login Code
-              </button>
             </>
           )}
         </div>
@@ -1242,11 +1164,8 @@ const renderVibeQuiz = () => {
       )}
 
       {unlocked && (
-        <div className="no-print" style={{ display: "flex", gap: "12px" }}>
-          <button onClick={() => window.print()} style={{ flex: 1, background: `linear-gradient(135deg, ${C.drift}, ${C.driftMid})`, border: "none", color: "#fff", borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
-            📄 Download PDF
-          </button>
-          <button onClick={resetAll} style={{ flex: 1, background: "transparent", border: `1.5px solid ${C.drift}`, color: C.drift, borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
+        <div className="no-print">
+          <button onClick={resetAll} style={{ width: "100%", background: "transparent", border: `1.5px solid ${C.drift}`, color: C.drift, borderRadius: "10px", padding: "14px", fontSize: "15px", fontWeight: 600, cursor: "pointer", fontFamily: font.body }}>
             ← Plan Another Trip
           </button>
         </div>
@@ -1281,15 +1200,6 @@ const renderVibeQuiz = () => {
       <div className="no-print" style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, boxShadow: "0 1px 8px rgba(0,0,0,0.04)" }}>
         <DriftwoodLogo />
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {session && (
-            <button onClick={() => { setShowMyTrips(true); loadMyTrips(); }} style={{
-              fontSize: "11px", fontFamily: font.body, fontWeight: 600, color: C.driftMid,
-              background: "transparent", border: `1px solid ${C.borderDark}`, borderRadius: "20px",
-              padding: "5px 12px", cursor: "pointer",
-            }}>
-              My Trips
-            </button>
-          )}
           {!previewResult && (
             <span style={{ fontSize: "10px", fontFamily: font.body, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", background: C.driftLight, color: C.driftMid, padding: "4px 10px", borderRadius: "20px", border: `1px solid ${C.borderDark}` }}>
               Beta
@@ -1300,35 +1210,6 @@ const renderVibeQuiz = () => {
 
       <div style={{ maxWidth: "580px", margin: "0 auto", padding: "36px 20px 80px" }}>
         <>
-{showMyTrips ? (
-  <div className="no-print">
-    <button onClick={() => setShowMyTrips(false)} style={{ background: "transparent", border: "none", color: C.muted, cursor: "pointer", fontSize: "13px", fontFamily: font.body, marginBottom: "20px" }}>
-      ← Back
-    </button>
-    <h2 style={{ fontFamily: font.display, fontSize: "24px", color: C.text, margin: "0 0 16px", fontWeight: 600 }}>My Trips</h2>
-    {tripsLoading ? (
-      <div style={{ fontSize: "13px", color: C.muted, fontFamily: font.body }}>Loading...</div>
-    ) : myTrips.length === 0 ? (
-      <div style={{ fontSize: "13px", color: C.muted, fontFamily: font.body }}>No saved trips yet — generate an itinerary and save it to see it here.</div>
-    ) : (
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        {myTrips.map((trip) => (
-          <button key={trip.id} onClick={() => openSavedTrip(trip)} style={{
-            textAlign: "left", background: C.surface, border: `1.5px solid ${C.border}`, borderRadius: "12px",
-            padding: "16px 18px", cursor: "pointer", fontFamily: font.body,
-          }}>
-            <div style={{ fontSize: "15px", fontWeight: 600, color: C.drift, fontFamily: font.display }}>{trip.destination || "Untitled trip"}</div>
-            <div style={{ fontSize: "12px", color: C.muted, marginTop: "3px" }}>{trip.duration} days · saved {new Date(trip.created_at).toLocaleDateString()}</div>
-          </button>
-        ))}
-      </div>
-    )}
-    <button onClick={signOutUser} style={{ marginTop: "24px", background: "transparent", border: `1.5px solid ${C.border}`, color: C.muted, borderRadius: "10px", padding: "12px 20px", fontSize: "13px", cursor: "pointer", fontFamily: font.body }}>
-      Log out
-    </button>
-  </div>
-) : (
-<>
 {showLanding && renderLanding()}
 {!previewResult && !loadingStage && !showLanding && step === 0 && <div><ProgressBar step={0} />{renderVibeQuiz()}</div>}
 {!previewResult && !loadingStage && !showLanding && step === 1 && <div><ProgressBar step={1} />{renderTripBasics()}</div>}
@@ -1342,8 +1223,6 @@ const renderVibeQuiz = () => {
 )}
 
 {previewResult && renderPreview()}
-</>
-)}
 </>
   <footer style={{ textAlign: "center", padding: "20px 0 0" }}>
     <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginBottom: "8px" }}>
