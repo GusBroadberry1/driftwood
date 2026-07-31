@@ -39,6 +39,13 @@ async function buildItineraryPdf({ destination, duration, budget, personality, p
           const clean = line
             .replace(/\*\*(.*?)\*\*/g, "$1")
             .replace(/^###\s*/, "")
+            .replace(/^>\s*/, "")
+            // Strip emoji and pictographs -- the PDF's font can't render
+            // them and shows garbled symbols instead. Accented letters
+            // (é, ü, etc.) are unaffected, since they sit in a much lower
+            // Unicode range than emoji.
+            .replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}]/gu, "")
+            .replace(/\s{2,}/g, " ")
             .trim();
           if (!clean) return;
           if (clean.startsWith("- ")) {
