@@ -10,11 +10,11 @@ module.exports = async function handler(req, res) {
     const { duration } = req.body;
     const days = Number(duration) || 7;
 
-    let amount = 599;
-    if (days <= 4) amount = 399;
-    else if (days <= 14) amount = 599;
-    else if (days <= 30) amount = 699;
-    else amount = 899;
+    let amount = 299;
+    if (days <= 4) amount = 199;
+    else if (days <= 14) amount = 299;
+    else if (days <= 30) amount = 399;
+    else amount = 499;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
