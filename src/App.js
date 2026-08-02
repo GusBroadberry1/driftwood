@@ -687,10 +687,10 @@ Write like a well-travelled friend. Concise, specific. Under 250 words total.`;
 
  const getPrice = () => {
   const days = Number(effectiveDuration) || 7;
-  if (days <= 4) return "3.99";
-  if (days <= 14) return "5.99";
-  if (days <= 30) return "6.99";
-  return "8.99";
+  if (days <= 4) return "1.99";
+  if (days <= 14) return "2.99";
+  if (days <= 30) return "3.99";
+  return "4.99";
 };
 
   const goToCheckout = async () => {
