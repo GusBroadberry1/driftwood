@@ -952,7 +952,7 @@ const renderVibeQuiz = () => {
       <p style={{ color: C.muted, fontSize: "13px", fontFamily: font.body, margin: "0 0 28px" }}>Where are you headed and when?</p>
       <div style={{ marginBottom: "22px" }}>
         <Label hint="Country, region, or city — or leave blank for a surprise trip">Destination (optional)</Label>
-        <TextInput placeholder="e.g. Southern Thailand, Bali, Colombia — or leave blank for a surprise trip" value={form.destination} onChange={(v) => setField("destination", v)} />
+        <TextInput placeholder="e.g. Southern Thailand, Bali, Colombia" value={form.destination} onChange={(v) => setField("destination", v)} />
       </div>
       <div style={{ marginBottom: "22px" }}>
   <Label>How long is the trip?</Label>
@@ -1136,8 +1136,13 @@ const renderVibeQuiz = () => {
       {unlocked && (
         <div className="no-print" style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "20px", marginBottom: "20px", textAlign: "center" }}>
           {pdfSent ? (
-            <div style={{ fontSize: "13px", color: C.drift, fontFamily: font.body, fontWeight: 600 }}>
-              📧 Sent! Check {pdfEmail} for your itinerary PDF.
+            <div>
+              <div style={{ fontSize: "13px", color: C.drift, fontFamily: font.body, fontWeight: 600 }}>
+                📧 Sent! Check {pdfEmail} for your itinerary PDF.
+              </div>
+              <div style={{ fontSize: "11px", color: C.muted, fontFamily: font.body, marginTop: "6px" }}>
+                Don't see it? Check your spam/junk folder — it can take a minute or two to arrive.
+              </div>
             </div>
           ) : (
             <>
