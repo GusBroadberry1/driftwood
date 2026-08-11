@@ -88,13 +88,13 @@ const vibeQuestions = [
   },
 
   {
-  id: "souvenir",
-  q: "What's your ideal souvenir from a trip?",
+  id: "moment",
+  q: "Pick the moment that sounds most like you",
   options: [
-    { label: "A photo that perfectly captures the moment", icon: "📸" },
-    { label: "A recipe or skill I learned from a local", icon: "🍳" },
-    { label: "Contacts and friendships I'll keep in touch with", icon: "📱" },
-    { label: "Nothing but stamps in my passport", icon: "🛂" },
+    { label: "Fumbling through a conversation in broken language and laughing about it", icon: "🗣" },
+    { label: "Knowing the polite way to greet, eat, and dress before you even land", icon: "📖" },
+    { label: "Ending up in a genuine conversation with someone you'd never normally meet", icon: "🤝" },
+    { label: "Politely nodding along and letting a translation app do the work", icon: "👌" },
   ],
 },
 
@@ -123,6 +123,12 @@ const paceOptions = [
   { value: "slow_deep", label: "Slow & Steady", desc: "1–2 places, really absorb them", icon: "🐢" },
   { value: "balanced", label: "Balanced", desc: "A few spots without rushing", icon: "🚶" },
   { value: "fast_packed", label: "Fast & Packed", desc: "Maximise every day", icon: "⚡" },
+];
+
+const transportOptions = [
+  { value: "comfort", label: "Taxis & Private Transfers", desc: "A driver waiting at every stop, no timetables to think about", icon: "🚕" },
+  { value: "mixed", label: "A Bit of Both", desc: "Bus or train between cities, taxi once you're there", icon: "🚌" },
+  { value: "local", label: "Like a Local", desc: "Squeeze onto the local bus, haggle with tuk-tuk drivers, go where the map app doesn't", icon: "🛺" },
 ];
 
 const groupOptions = [
@@ -532,7 +538,7 @@ export default function App() {
   const [form, setForm] = useState({
     destination: "", duration: "", customDuration: "", budget: "", departure:"",
     startDate: "", group: "", accom: "", pace: "",
-    transit: "3", interests: [], avoids: [], notes: "",
+    transit: "", interests: [], avoids: [], notes: "",
   });
   const [previewResult, setPreviewResult] = useState(null);
 const [fullResult1, setFullResult1] = useState(null);
@@ -725,7 +731,7 @@ TRAVELLER PROFILE:
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
 - Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
 - Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}
-- Transit Comfort: ${form.transit}/5
+- Transit Comfort: ${transportOptions.find((o) => o.value === form.transit)?.label || "Not specified"}
 - Interests: ${form.interests.join(", ")}
 - Avoid: ${form.avoids.length ? form.avoids.join(", ") : "Nothing specified"}
 - Notes: ${form.notes || "None"}
@@ -799,7 +805,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setStep(0);
     setVibeQ(0);
     setVibeAnswers({});
-    setForm({ destination: "", duration: "", customDuration: "", budget: "", departure: "", startDate: "", group: "", accom: "", pace: "", transit: "3", interests: [], avoids: [], notes: "" });
+    setForm({ destination: "", duration: "", customDuration: "", budget: "", departure: "", startDate: "", group: "", accom: "", pace: "", transit: "", interests: [], avoids: [], notes: "" });
     setReviewRating(0);
     setReviewComment("");
     setReviewSent(false);
@@ -996,14 +1002,10 @@ const renderVibeQuiz = () => {
       <div style={{ marginBottom: "24px" }}><Label>Accommodation vibe</Label><SelectCard options={accomOptions} value={form.accom} onChange={(v) => setField("accom", v)} cols={2} /></div>
       <div style={{ marginBottom: "24px" }}><Label>Travel pace</Label><SelectCard options={paceOptions} value={form.pace} onChange={(v) => setField("pace", v)} cols={3} /></div>
       <div style={{ marginBottom: "24px" }}>
-        <Label hint="1 = taxis only  ·  5 = local buses, tuk-tuks, anything goes">Local Transport Style — {form.transit}/5</Label>
-        <input type="range" min="1" max="5" value={form.transit} onChange={(e) => setField("transit", e.target.value)}
-          style={{ width: "100%", accentColor: C.drift, cursor: "pointer", marginBottom: "4px" }} />
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: C.muted, fontFamily: font.body }}>
-          <span>Comfort only</span><span>Local everything</span>
-        </div>
+        <Label>How do you want to get around while you're there?</Label>
+        <SelectCard options={transportOptions} value={form.transit} onChange={(v) => setField("transit", v)} cols={3} />
       </div>
-      <NavButtons onBack={() => setStep(1)} onNext={() => setStep(3)} nextDisabled={!form.accom || !form.pace} />
+      <NavButtons onBack={() => setStep(1)} onNext={() => setStep(3)} nextDisabled={!form.accom || !form.pace || !form.transit} />
     </div>
   );
 
