@@ -88,17 +88,6 @@ const vibeQuestions = [
   },
 
   {
-  id: "moment",
-  q: "Pick the moment that sounds most like you",
-  options: [
-    { label: "Fumbling through a conversation in broken language and laughing about it", icon: "🗣" },
-    { label: "Knowing the polite way to greet, eat, and dress before you even land", icon: "📖" },
-    { label: "Ending up in a genuine conversation with someone you'd never normally meet", icon: "🤝" },
-    { label: "Politely nodding along and letting a translation app do the work", icon: "👌" },
-  ],
-},
-
-  {
     id: "budget_style",
     q: "How do you think about money on the road?",
     options: [
@@ -890,6 +879,16 @@ const renderLanding = () => (
     }}>
       Get Started →
     </button>
+    <div style={{ marginTop: "40px", fontSize: "11px", color: C.muted, fontFamily: font.body }}>
+      Just need a place to book?
+      <div style={{ marginTop: "8px", display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" }}>
+        <a href={CJ_BOOKING_LINK_BASE} target="_blank" rel="noopener noreferrer sponsored" style={{ color: C.driftMid, fontWeight: 600, textDecoration: "none" }}>Booking.com</a>
+        <span style={{ color: C.border }}>·</span>
+        <a href="https://www.getyourguide.com?partner_id=NAMQ8MQ&cmp=share_to_earn" target="_blank" rel="noopener noreferrer sponsored" style={{ color: C.driftMid, fontWeight: 600, textDecoration: "none" }}>GetYourGuide</a>
+        <span style={{ color: C.border }}>·</span>
+        <a href="https://www.skyscanner.net" target="_blank" rel="noopener noreferrer" style={{ color: C.driftMid, fontWeight: 600, textDecoration: "none" }}>Skyscanner</a>
+      </div>
+    </div>
   </div>
 );
 
@@ -1003,7 +1002,25 @@ const renderVibeQuiz = () => {
       <div style={{ marginBottom: "24px" }}><Label>Travel pace</Label><SelectCard options={paceOptions} value={form.pace} onChange={(v) => setField("pace", v)} cols={3} /></div>
       <div style={{ marginBottom: "24px" }}>
         <Label>How do you want to get around while you're there?</Label>
-        <SelectCard options={transportOptions} value={form.transit} onChange={(v) => setField("transit", v)} cols={3} />
+        <div style={{ background: C.driftLight, border: `1.5px solid ${C.borderDark}`, borderRadius: "12px", padding: "16px 18px", marginBottom: "12px", textAlign: "center" }}>
+          <div style={{ fontSize: "26px", marginBottom: "4px" }}>{transportOptions[Math.max(0, transportOptions.findIndex((o) => o.value === form.transit))].icon}</div>
+          <div style={{ fontSize: "14px", fontWeight: 600, color: C.drift, fontFamily: font.body }}>{transportOptions[Math.max(0, transportOptions.findIndex((o) => o.value === form.transit))].label}</div>
+          <div style={{ fontSize: "12px", color: C.muted, fontFamily: font.body, marginTop: "3px" }}>{transportOptions[Math.max(0, transportOptions.findIndex((o) => o.value === form.transit))].desc}</div>
+        </div>
+        <input type="range" min="0" max={transportOptions.length - 1} step="1"
+          value={Math.max(0, transportOptions.findIndex((o) => o.value === form.transit))}
+          onChange={(e) => setField("transit", transportOptions[Number(e.target.value)].value)}
+          style={{ width: "100%", accentColor: C.drift, cursor: "pointer", marginBottom: "4px" }} />
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          {transportOptions.map((o, i) => {
+            const isSelected = o.value === form.transit;
+            return (
+              <span key={o.value} style={{ fontSize: "10px", fontFamily: font.body, color: isSelected ? C.drift : C.muted, fontWeight: isSelected ? 600 : 400, maxWidth: "33%", textAlign: i === 0 ? "left" : i === transportOptions.length - 1 ? "right" : "center" }}>
+                {o.label}
+              </span>
+            );
+          })}
+        </div>
       </div>
       <NavButtons onBack={() => setStep(1)} onNext={() => setStep(3)} nextDisabled={!form.accom || !form.pace || !form.transit} />
     </div>
