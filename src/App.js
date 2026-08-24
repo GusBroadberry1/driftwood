@@ -1272,11 +1272,6 @@ const renderVibeQuiz = () => {
       <div className="no-print" style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "14px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10, boxShadow: "0 1px 8px rgba(0,0,0,0.04)" }}>
         <DriftwoodLogo />
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {!previewResult && (
-            <span style={{ fontSize: "10px", fontFamily: font.body, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", background: C.driftLight, color: C.driftMid, padding: "4px 10px", borderRadius: "20px", border: `1px solid ${C.borderDark}` }}>
-              Beta
-            </span>
-          )}
         </div>
       </div>
 
