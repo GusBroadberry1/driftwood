@@ -650,7 +650,7 @@ TRAVELLER PROFILE:
 - Travel Personality: ${p.name} — ${p.desc}
 - Destination: ${form.destination || `Not specified — choose ONE single destination that genuinely fits this traveller's personality, interests, budget, avoids and pace below. Weigh trip length heavily: for a short trip (a weekend or under a week), favour destinations realistically reachable in that time from the UK, not far-flung long-haul picks, unless their interests specifically justify it. Also factor in the travel dates given below — the season, weather, and any obvious occasion (e.g. a December date suggests a festive/winter-break feel unless their interests say otherwise) should shape the choice, not just interests in isolation. If travelling as a couple, lean toward a destination that suits a couple's trip unless their interests clearly point elsewhere. Before anything else, on its own line with nothing else on it, output exactly: DESTINATION: <Your Chosen Place>`}
 - Duration: ${effectiveDuration} days
-- ${form.tripType === "holiday" ? `Total Trip Budget: £${form.budget} for the entire trip (not per day)` : `Daily Budget: £${form.budget}/day GBP`}
+- ${form.tripType === "backpacking" ? `Total Trip Budget: £${form.budget} for the entire trip (not per day)` : `Daily Budget: £${form.budget}/day GBP`}
 - Travel Dates: ${effectiveStartDate || "Flexible"}
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
 - Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
@@ -721,7 +721,7 @@ TRAVELLER PROFILE:
 - Travel Personality: ${p.name}
 - Destination: ${form.destination || "Not specified — continue with whichever destination fits this traveller's profile best, and state it clearly at the start of your response."}
 - Duration: ${effectiveDuration} days
-- ${form.tripType === "holiday" ? `Total Trip Budget: £${form.budget} for the entire trip (not per day)` : `Daily Budget: £${form.budget}/day GBP`}
+- ${form.tripType === "backpacking" ? `Total Trip Budget: £${form.budget} for the entire trip (not per day)` : `Daily Budget: £${form.budget}/day GBP`}
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
 - Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
 ${form.tripType === "holiday" ? `- Pace: Not applicable for a holiday — settle in and relax rather than rushing between sights` : `- Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}`}
@@ -738,7 +738,7 @@ Respond with EXACTLY these sections, each kept concise:
 3 standout highlights, one line each.
 
 ## Accommodation
-1 specific hostel/stay per main location, with nightly cost and one line of context. The nightly cost must realistically fit within the traveller's stated budget (${form.tripType === "holiday" ? `a total trip budget of £${form.budget} across ${effectiveDuration} days — work out a sensible nightly accommodation figure from that` : `a daily budget of £${form.budget}/day`}) — this is a hard constraint and takes priority over the stated accommodation style (${accomOptions.find((o) => o.value === form.accom)?.label}) if the two conflict. If the budget can't realistically support that accommodation style in this destination, say so honestly in one line and suggest the closest realistic option within budget, rather than silently ignoring the budget or the style.
+1 specific hostel/stay per main location, with nightly cost and one line of context. The nightly cost must realistically fit within the traveller's stated budget (${form.tripType === "backpacking" ? `a total trip budget of £${form.budget} across ${effectiveDuration} days — work out a sensible nightly accommodation figure from that` : `a daily budget of £${form.budget}/day`}) — this is a hard constraint and takes priority over the stated accommodation style (${accomOptions.find((o) => o.value === form.accom)?.label}) if the two conflict. If the budget can't realistically support that accommodation style in this destination, say so honestly in one line and suggest the closest realistic option within budget, rather than silently ignoring the budget or the style.
 
 ${isLong
   ? `## Trip Breakdown
@@ -929,12 +929,10 @@ const renderTripTypeChoice = () => (
           borderRadius: "16px", padding: "20px", cursor: "pointer",
           textAlign: "left", marginBottom: "14px",
           boxShadow: "0 3px 14px rgba(92,74,50,0.07)",
-          position: "relative", overflow: "hidden",
         }}>
-          <span style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "4px", background: `linear-gradient(180deg, ${C.drift}, ${C.driftMid})` }} />
           <span style={{ width: "52px", height: "52px", borderRadius: "14px", flexShrink: 0, background: C.driftLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px" }}>{opt.icon}</span>
           <span>
-            <span style={{ display: "block", fontSize: "16px", fontFamily: font.display, color: C.text, fontWeight: 600 }}>{opt.label}</span>
+            <span style={{ display: "block", fontSize: "15px", fontFamily: font.body, color: C.textMid, fontWeight: 600 }}>{opt.label}</span>
             <span style={{ display: "block", fontSize: "12.5px", fontFamily: font.body, color: C.muted, marginTop: "3px", lineHeight: 1.4 }}>{opt.desc}</span>
           </span>
         </button>
@@ -1024,7 +1022,7 @@ const renderVibeQuiz = () => {
   )}
 </div>
 <div style={{ marginBottom: "22px" }}>
-  <Label hint={form.tripType === "holiday" ? "Your overall budget for the whole trip — covers accommodation, food, transport and activities, not flights" : "Covers accommodation, food, transport and activities — not flights"}>{form.tripType === "holiday" ? "Total Trip Budget (£)" : "Daily Budget (£)"}</Label>
+  <Label hint={form.tripType === "backpacking" ? "Your overall budget for the whole trip — covers accommodation, food, transport and activities, not flights" : "Covers accommodation, food, transport and activities — not flights"}>{form.tripType === "backpacking" ? "Total Trip Budget (£)" : "Daily Budget (£)"}</Label>
   <TextInput type="number" placeholder="e.g. 40" value={form.budget} onChange={(v) => setField("budget", v)} />
 </div>
 
@@ -1108,12 +1106,12 @@ const renderVibeQuiz = () => {
       <div style={{ background: `linear-gradient(135deg, ${C.drift} 0%, #3D2B1A 100%)`, borderRadius: "16px", padding: "28px", marginBottom: "20px", color: "#fff" }}>
         <div style={{ fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600, opacity: 0.7, marginBottom: "8px", fontFamily: font.body }}>Your Driftwood Preview</div>
         <h2 style={{ fontFamily: font.display, fontSize: "30px", margin: "0 0 4px", fontWeight: 600 }}>{form.destination}</h2>
-        <div style={{ fontSize: "14px", opacity: 0.8, fontFamily: font.body }}>{effectiveDuration} days · £{form.budget}{form.tripType === "holiday" ? " total" : "/day"} · {p.emoji} {p.name}</div>
+        <div style={{ fontSize: "14px", opacity: 0.8, fontFamily: font.body }}>{effectiveDuration} days · £{form.budget}{form.tripType === "backpacking" ? " total" : "/day"} · {p.emoji} {p.name}</div>
       </div>
 
       <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "16px" }}>
         <OutputSection emoji="💰" title="Budget Breakdown">
-          <BudgetVisualiser budget={Number(form.budget)} duration={Number(effectiveDuration)} isTotal={form.tripType === "holiday"} />
+          <BudgetVisualiser budget={Number(form.budget)} duration={Number(effectiveDuration)} isTotal={form.tripType === "backpacking"} />
         </OutputSection>
       </div>
 
