@@ -134,13 +134,15 @@ const groupOptions = [
 ];
 
 const durationOptions = [
-  { value: "3", label: "Weekend Getaway", desc: "2–4 days", icon: "⚡" },
-  { value: "7", label: "One Week", desc: "5–8 days", icon: "📅" },
-  { value: "12", label: "Two Weeks", desc: "10–14 days", icon: "🗺" },
-  { value: "21", label: "Extended Trip", desc: "3–4 weeks", icon: "✈️" },
-  { value: "90", label: "Extended Travel", desc: "2–3+ months", icon: "🌍" },
-  { value: "custom", label: "Exact Number", desc: "Tell us the precise day count", icon: "🔢" },
+  { value: "3", label: "Weekend Getaway", desc: "2–4 days", icon: "⚡", types: ["holiday"] },
+  { value: "7", label: "One Week", desc: "5–8 days", icon: "📅", types: ["holiday", "backpacking"] },
+  { value: "12", label: "Two Weeks", desc: "10–14 days", icon: "🗺", types: ["holiday", "backpacking"] },
+  { value: "21", label: "Extended Trip", desc: "3–4 weeks", icon: "✈️", types: ["backpacking"] },
+  { value: "90", label: "Extended Travel", desc: "2–3+ months", icon: "🌍", types: ["backpacking"] },
+  { value: "custom", label: "Exact Number", desc: "Tell us the precise day count", icon: "🔢", types: ["holiday", "backpacking"] },
 ];
+
+const durationOptionsFor = (tripType) => durationOptions.filter((o) => !tripType || o.types.includes(tripType));
 
 const interestOptions = [
   { label: "Food & Markets", icon: "🍜" },
@@ -1014,7 +1016,7 @@ const renderVibeQuiz = () => {
       </div>
       <div style={{ marginBottom: "22px" }}>
   <Label>How long is the trip?</Label>
-  <SelectCard options={durationOptions} value={form.duration} onChange={(v) => setField("duration", v)} cols={2} />
+  <SelectCard options={durationOptionsFor(form.tripType)} value={form.duration} onChange={(v) => setField("duration", v)} cols={2} />
   {form.duration === "custom" && (
     <div style={{ marginTop: "12px" }}>
       <TextInput type="number" placeholder="e.g. 45" value={form.customDuration} onChange={(v) => setField("customDuration", v)} />
