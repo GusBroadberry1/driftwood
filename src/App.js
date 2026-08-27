@@ -100,13 +100,18 @@ const vibeQuestions = [
 ];
 
 const accomOptions = [
-  { value: "solo_private", label: "Solo & Private", desc: "Private rooms, still budget", icon: "🔒" },
-  { value: "social_nomad", label: "Social Nomad", desc: "4–8 bed dorms, hostel bars", icon: "🛏" },
-  { value: "party_hostel", label: "Party Hostel", desc: "8–16 bed, events every night", icon: "🎉" },
-  { value: "mixed", label: "Flexible", desc: "Dorms on transit nights, private when resting", icon: "⚖️" },
-  { value: "comfort_hotels", label: "Comfort & Hotels", desc: "Private hotels, more comfort, less hostel-hopping", icon: "🛎️" },
-  { value: "apartment_villa", label: "Apartment & Villa", desc: "Self-catering, more space, great for groups", icon: "🏡" },
+  { value: "solo_private", label: "Solo & Private", desc: "Private rooms, still budget", icon: "🔒", types: ["backpacking"] },
+  { value: "social_nomad", label: "Social Nomad", desc: "4–8 bed dorms, hostel bars", icon: "🛏", types: ["backpacking"] },
+  { value: "party_hostel", label: "Party Hostel", desc: "8–16 bed, events every night", icon: "🎉", types: ["backpacking"] },
+  { value: "mixed", label: "Flexible", desc: "Dorms on transit nights, private when resting", icon: "⚖️", types: ["backpacking"] },
+  { value: "budget_hotel", label: "Budget Hotel", desc: "A private, no-frills hotel room when you need a proper night's sleep", icon: "🏨", types: ["backpacking"] },
+  { value: "hotels", label: "Hotels", desc: "Full-service hotels, breakfast included, someone else handles the details", icon: "🛎️", types: ["holiday"] },
+  { value: "villas", label: "Villas", desc: "A private villa, often with a pool, space to spread out", icon: "🏡", types: ["holiday"] },
+  { value: "apartments", label: "Apartments", desc: "Self-catering, your own space, good value for longer stays", icon: "🏢", types: ["holiday"] },
+  { value: "resort", label: "Resort / All-Inclusive", desc: "Everything sorted on-site — food, drinks, activities included", icon: "🏝️", types: ["holiday"] },
 ];
+
+const accomOptionsFor = (tripType) => accomOptions.filter((o) => !tripType || o.types.includes(tripType));
 
 const paceOptions = [
   { value: "slow_deep", label: "Slow & Steady", desc: "1–2 places, really absorb them", icon: "🐢" },
@@ -339,8 +344,8 @@ const OutputSection = ({ emoji, title, children, last }) => (
   </div>
 );
 
-const BudgetVisualiser = ({ budget, duration }) => {
-  const total = budget * duration;
+const BudgetVisualiser = ({ budget, duration, isTotal }) => {
+  const total = isTotal ? budget : budget * duration;
   const splits = [
     { label: "Accommodation", pct: 0.3, color: C.drift },
     { label: "Food & Drink", pct: 0.28, color: C.driftMid },
@@ -383,8 +388,8 @@ const BudgetVisualiser = ({ budget, duration }) => {
                 <span style={{ fontSize: "13px", fontFamily: font.body, color: C.textMid }}>{s.label}</span>
               </div>
               <div style={{ textAlign: "right" }}>
-                <span style={{ fontSize: "13px", fontWeight: 600, fontFamily: font.body, color: C.text }}>£{Math.round(budget * s.pct)}</span>
-               <span style={{ fontSize: "11px", color: C.muted, fontFamily: font.body }}>/day</span>
+                <span style={{ fontSize: "13px", fontWeight: 600, fontFamily: font.body, color: C.text }}>£{Math.round(total * s.pct)}</span>
+               <span style={{ fontSize: "11px", color: C.muted, fontFamily: font.body }}> total</span>
               </div>
             </div>
           ))}
@@ -525,7 +530,7 @@ export default function App() {
   const [vibeAnswers, setVibeAnswers] = useState({});
   const [vibeQ, setVibeQ] = useState(0);
   const [form, setForm] = useState({
-    destination: "", duration: "", customDuration: "", budget: "", departure:"",
+    tripType: "", destination: "", duration: "", customDuration: "", budget: "", departure:"",
     startDate: "", group: "", accom: "", pace: "",
     transit: "", interests: [], avoids: [], notes: "",
   });
@@ -604,7 +609,7 @@ useEffect(() => {
   const effectiveDuration = form.duration === "custom" ? form.customDuration : form.duration;
   const startDateIsValid = form.startDate && form.startDate >= toLocalYMD(new Date());
   const effectiveStartDate = startDateIsValid ? form.startDate : "";
-  const canGenerate = form.duration && (form.duration !== "custom" || form.customDuration) && form.budget && form.accom && form.pace && form.interests.length >= 1;
+  const canGenerate = form.duration && (form.duration !== "custom" || form.customDuration) && form.budget && form.accom && (form.tripType === "holiday" || form.pace) && form.interests.length >= 1;
 
   const buildBookingLink = () => {
     const params = new URLSearchParams();
@@ -645,11 +650,11 @@ TRAVELLER PROFILE:
 - Travel Personality: ${p.name} — ${p.desc}
 - Destination: ${form.destination || `Not specified — choose ONE single destination that genuinely fits this traveller's personality, interests, budget, avoids and pace below. Weigh trip length heavily: for a short trip (a weekend or under a week), favour destinations realistically reachable in that time from the UK, not far-flung long-haul picks, unless their interests specifically justify it. Also factor in the travel dates given below — the season, weather, and any obvious occasion (e.g. a December date suggests a festive/winter-break feel unless their interests say otherwise) should shape the choice, not just interests in isolation. If travelling as a couple, lean toward a destination that suits a couple's trip unless their interests clearly point elsewhere. Before anything else, on its own line with nothing else on it, output exactly: DESTINATION: <Your Chosen Place>`}
 - Duration: ${effectiveDuration} days
-- Daily Budget: £${form.budget}/day GBP
+- ${form.tripType === "holiday" ? `Total Trip Budget: £${form.budget} for the entire trip (not per day)` : `Daily Budget: £${form.budget}/day GBP`}
 - Travel Dates: ${effectiveStartDate || "Flexible"}
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
 - Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
-- Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}
+${form.tripType === "holiday" ? `- Pace: Not applicable for a holiday — settle in and relax rather than rushing between sights` : `- Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}`}
 - Interests: ${form.interests.join(", ")}
 - Avoid: ${form.avoids.length ? form.avoids.join(", ") : "Nothing specified"}
 
@@ -716,10 +721,10 @@ TRAVELLER PROFILE:
 - Travel Personality: ${p.name}
 - Destination: ${form.destination || "Not specified — continue with whichever destination fits this traveller's profile best, and state it clearly at the start of your response."}
 - Duration: ${effectiveDuration} days
-- Daily Budget: £${form.budget}/day GBP
+- ${form.tripType === "holiday" ? `Total Trip Budget: £${form.budget} for the entire trip (not per day)` : `Daily Budget: £${form.budget}/day GBP`}
 - Group: ${groupOptions.find((g) => g.value === form.group)?.label || "Not specified"}
 - Accommodation: ${accomOptions.find((o) => o.value === form.accom)?.label}
-- Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}
+${form.tripType === "holiday" ? `- Pace: Not applicable for a holiday — settle in and relax rather than rushing between sights` : `- Pace: ${paceOptions.find((o) => o.value === form.pace)?.label}`}
 - Transit Comfort: ${transportOptions.find((o) => o.value === form.transit)?.label || "Not specified"}
 - Interests: ${form.interests.join(", ")}
 - Avoid: ${form.avoids.length ? form.avoids.join(", ") : "Nothing specified"}
@@ -733,13 +738,13 @@ Respond with EXACTLY these sections, each kept concise:
 3 standout highlights, one line each.
 
 ## Accommodation
-1 specific hostel/stay per main location, with nightly cost and one line of context. The nightly cost must realistically fit the traveller's stated daily budget of £${form.budget}/day — this is a hard constraint and takes priority over the stated accommodation style (${accomOptions.find((o) => o.value === form.accom)?.label}) if the two conflict. If the budget can't realistically support that accommodation style in this destination, say so honestly in one line and suggest the closest realistic option within budget, rather than silently ignoring the budget or the style.
+1 specific hostel/stay per main location, with nightly cost and one line of context. The nightly cost must realistically fit within the traveller's stated budget (${form.tripType === "holiday" ? `a total trip budget of £${form.budget} across ${effectiveDuration} days — work out a sensible nightly accommodation figure from that` : `a daily budget of £${form.budget}/day`}) — this is a hard constraint and takes priority over the stated accommodation style (${accomOptions.find((o) => o.value === form.accom)?.label}) if the two conflict. If the budget can't realistically support that accommodation style in this destination, say so honestly in one line and suggest the closest realistic option within budget, rather than silently ignoring the budget or the style.
 
 ${isLong
   ? `## Trip Breakdown
-This is a longer trip (${effectiveDuration} days). Structure as phases covering roughly 2 weeks each — for a 90 day trip this means about 6 phases total, not one per week. Use the exact format "### Phase N" (e.g. "### Phase 1") as a header immediately before each phase's content — this exact format is required so the app can display each phase separately. Keep each phase to 4-5 sentences maximum, no exceptions. Pace note: ${form.pace === "fast_packed" ? "move to a new location every 2-3 days within each phase" : form.pace === "slow_deep" ? "settle into 1-2 base locations per phase, minimal moving" : "a balanced mix of settling in and moving on"}.`
+This is a longer trip (${effectiveDuration} days). Structure as phases covering roughly 2 weeks each — for a 90 day trip this means about 6 phases total, not one per week. Use the exact format "### Phase N" (e.g. "### Phase 1") as a header immediately before each phase's content — this exact format is required so the app can display each phase separately. Keep each phase to 4-5 sentences maximum, no exceptions. Pace note: ${form.tripType === "holiday" ? "settle in, minimal moving between locations" : form.pace === "fast_packed" ? "move to a new location every 2-3 days within each phase" : form.pace === "slow_deep" ? "settle into 1-2 base locations per phase, minimal moving" : "a balanced mix of settling in and moving on"}.`
   : `## Day-by-Day Breakdown
-Days 2 onwards. Use the exact format "### Day N" (e.g. "### Day 2") as a header immediately before each day's content — this exact format is required so the app can display each day separately. Each day: Morning/Afternoon/Evening as short bullets. One restaurant tip per day. Keep each day tight — no more than 5 bullet points total. Pace note: ${form.pace === "fast_packed" ? "change location every 2-3 days, don't linger" : form.pace === "slow_deep" ? "stay in 1-2 places for most of the trip, deep not wide" : "moderate movement between locations"}.`
+Days 2 onwards. Use the exact format "### Day N" (e.g. "### Day 2") as a header immediately before each day's content — this exact format is required so the app can display each day separately. Each day: Morning/Afternoon/Evening as short bullets. One restaurant tip per day. Keep each day tight — no more than 5 bullet points total. Pace note: ${form.tripType === "holiday" ? "settled and relaxed, minimal moving between locations" : form.pace === "fast_packed" ? "change location every 2-3 days, don't linger" : form.pace === "slow_deep" ? "stay in 1-2 places for most of the trip, deep not wide" : "moderate movement between locations"}.`
 }
 
 ## Season & Timing
@@ -794,7 +799,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
     setStep(0);
     setVibeQ(0);
     setVibeAnswers({});
-    setForm({ destination: "", duration: "", customDuration: "", budget: "", departure: "", startDate: "", group: "", accom: "", pace: "", transit: "", interests: [], avoids: [], notes: "" });
+    setForm({ tripType: "", destination: "", duration: "", customDuration: "", budget: "", departure: "", startDate: "", group: "", accom: "", pace: "", transit: "", interests: [], avoids: [], notes: "" });
     setReviewRating(0);
     setReviewComment("");
     setReviewSent(false);
@@ -892,6 +897,52 @@ const renderLanding = () => (
   </div>
 );
 
+const renderTripTypeChoice = () => (
+  <div>
+    <style>{`
+      @keyframes ttRiseIn {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .tt-logo { opacity: 0; animation: ttRiseIn 0.5s ease-out 0.05s forwards; }
+      .tt-heading { opacity: 0; animation: ttRiseIn 0.5s ease-out 0.15s forwards; }
+      .tt-sub { opacity: 0; animation: ttRiseIn 0.5s ease-out 0.25s forwards; }
+      .tt-divider { opacity: 0; animation: ttRiseIn 0.5s ease-out 0.35s forwards; }
+      .tt-option { opacity: 0; animation: ttRiseIn 0.5s cubic-bezier(0.22,1,0.36,1) forwards; }
+      .tt-option:nth-of-type(1) { animation-delay: 0.45s; }
+      .tt-option:nth-of-type(2) { animation-delay: 0.58s; }
+    `}</style>
+    <div style={{ textAlign: "center", marginBottom: "12px" }} className="tt-logo">
+      <DriftwoodLogo size="large" />
+    </div>
+    <h2 className="tt-heading" style={{ fontFamily: font.display, fontSize: "27px", color: C.text, margin: "28px 0 6px", lineHeight: 1.2, fontWeight: 600, textAlign: "center" }}>What kind of trip is this?</h2>
+    <p className="tt-sub" style={{ color: C.muted, fontSize: "13px", fontFamily: font.body, margin: "0 0 20px", textAlign: "center" }}>This shapes the questions we ask and the itinerary you get</p>
+    <div className="tt-divider" style={{ textAlign: "center", marginBottom: "28px", color: C.driftMid, fontSize: "15px", letterSpacing: "2px", opacity: 0.5 }}>◦ ◦ ◦</div>
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      {[
+        { value: "backpacking", label: "Backpacking / Extended Travel", desc: "Hostels, route-hopping, longer trips on the move", icon: "🎒" },
+        { value: "holiday", label: "Holiday / Short Break", desc: "Hotels or a rental, settled in one or two places", icon: "🏖️" },
+      ].map((opt) => (
+        <button key={opt.value} className="tt-option" onClick={() => setField("tripType", opt.value)} style={{
+          display: "flex", alignItems: "center", gap: "16px",
+          background: C.surface, border: `1.5px solid ${C.border}`,
+          borderRadius: "16px", padding: "20px", cursor: "pointer",
+          textAlign: "left", marginBottom: "14px",
+          boxShadow: "0 3px 14px rgba(92,74,50,0.07)",
+          position: "relative", overflow: "hidden",
+        }}>
+          <span style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "4px", background: `linear-gradient(180deg, ${C.drift}, ${C.driftMid})` }} />
+          <span style={{ width: "52px", height: "52px", borderRadius: "14px", flexShrink: 0, background: C.driftLight, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px" }}>{opt.icon}</span>
+          <span>
+            <span style={{ display: "block", fontSize: "16px", fontFamily: font.display, color: C.text, fontWeight: 600 }}>{opt.label}</span>
+            <span style={{ display: "block", fontSize: "12.5px", fontFamily: font.body, color: C.muted, marginTop: "3px", lineHeight: 1.4 }}>{opt.desc}</span>
+          </span>
+        </button>
+      ))}
+    </div>
+  </div>
+);
+
 const renderVibeQuiz = () => {
     const q = vibeQuestions[vibeQ];
     return (
@@ -932,9 +983,13 @@ const renderVibeQuiz = () => {
             );
           })}
         </div>
-        {vibeQ > 0 && (
+        {vibeQ > 0 ? (
           <button onClick={() => setVibeQ((v) => v - 1)} style={{ marginTop: "16px", background: "transparent", border: "none", color: C.muted, cursor: "pointer", fontSize: "13px", fontFamily: font.body }}>
             ← Previous
+          </button>
+        ) : (
+          <button onClick={() => setField("tripType", "")} style={{ marginTop: "16px", background: "transparent", border: "none", color: C.muted, cursor: "pointer", fontSize: "13px", fontFamily: font.body }}>
+            ← Back
           </button>
         )}
       </div>
@@ -969,7 +1024,7 @@ const renderVibeQuiz = () => {
   )}
 </div>
 <div style={{ marginBottom: "22px" }}>
-  <Label hint="Covers accommodation, food, transport and activities — not flights">Daily Budget (£)</Label>
+  <Label hint={form.tripType === "holiday" ? "Your overall budget for the whole trip — covers accommodation, food, transport and activities, not flights" : "Covers accommodation, food, transport and activities — not flights"}>{form.tripType === "holiday" ? "Total Trip Budget (£)" : "Daily Budget (£)"}</Label>
   <TextInput type="number" placeholder="e.g. 40" value={form.budget} onChange={(v) => setField("budget", v)} />
 </div>
 
@@ -998,8 +1053,10 @@ const renderVibeQuiz = () => {
     <div>
       <h2 style={{ fontFamily: font.display, fontSize: "24px", color: C.text, margin: "0 0 4px", fontWeight: 600 }}>Travel style</h2>
       <p style={{ color: C.muted, fontSize: "13px", fontFamily: font.body, margin: "0 0 28px" }}>How do you like to move through the world?</p>
-      <div style={{ marginBottom: "24px" }}><Label>Accommodation vibe</Label><SelectCard options={accomOptions} value={form.accom} onChange={(v) => setField("accom", v)} cols={2} /></div>
-      <div style={{ marginBottom: "24px" }}><Label>Travel pace</Label><SelectCard options={paceOptions} value={form.pace} onChange={(v) => setField("pace", v)} cols={3} /></div>
+      <div style={{ marginBottom: "24px" }}><Label>Accommodation vibe</Label><SelectCard options={accomOptionsFor(form.tripType)} value={form.accom} onChange={(v) => setField("accom", v)} cols={2} /></div>
+      {form.tripType !== "holiday" && (
+        <div style={{ marginBottom: "24px" }}><Label>Travel pace</Label><SelectCard options={paceOptions} value={form.pace} onChange={(v) => setField("pace", v)} cols={3} /></div>
+      )}
       <div style={{ marginBottom: "24px" }}>
         <Label>How do you want to get around while you're there?</Label>
         <div style={{ background: C.driftLight, border: `1.5px solid ${C.borderDark}`, borderRadius: "12px", padding: "16px 18px", marginBottom: "12px", textAlign: "center" }}>
@@ -1022,7 +1079,7 @@ const renderVibeQuiz = () => {
           })}
         </div>
       </div>
-      <NavButtons onBack={() => setStep(1)} onNext={() => setStep(3)} nextDisabled={!form.accom || !form.pace || !form.transit} />
+      <NavButtons onBack={() => setStep(1)} onNext={() => setStep(3)} nextDisabled={!form.accom || (form.tripType !== "holiday" && !form.pace) || !form.transit} />
     </div>
   );
 
@@ -1051,12 +1108,12 @@ const renderVibeQuiz = () => {
       <div style={{ background: `linear-gradient(135deg, ${C.drift} 0%, #3D2B1A 100%)`, borderRadius: "16px", padding: "28px", marginBottom: "20px", color: "#fff" }}>
         <div style={{ fontSize: "11px", letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 600, opacity: 0.7, marginBottom: "8px", fontFamily: font.body }}>Your Driftwood Preview</div>
         <h2 style={{ fontFamily: font.display, fontSize: "30px", margin: "0 0 4px", fontWeight: 600 }}>{form.destination}</h2>
-        <div style={{ fontSize: "14px", opacity: 0.8, fontFamily: font.body }}>{effectiveDuration} days · £{form.budget}/day · {p.emoji} {p.name}</div>
+        <div style={{ fontSize: "14px", opacity: 0.8, fontFamily: font.body }}>{effectiveDuration} days · £{form.budget}{form.tripType === "holiday" ? " total" : "/day"} · {p.emoji} {p.name}</div>
       </div>
 
       <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "16px" }}>
         <OutputSection emoji="💰" title="Budget Breakdown">
-          <BudgetVisualiser budget={Number(form.budget)} duration={Number(effectiveDuration)} />
+          <BudgetVisualiser budget={Number(form.budget)} duration={Number(effectiveDuration)} isTotal={form.tripType === "holiday"} />
         </OutputSection>
       </div>
 
@@ -1278,7 +1335,8 @@ const renderVibeQuiz = () => {
       <div style={{ maxWidth: "580px", margin: "0 auto", padding: "36px 20px 80px" }}>
         <>
 {showLanding && renderLanding()}
-{!previewResult && !loadingStage && !showLanding && step === 0 && <div><ProgressBar step={0} />{renderVibeQuiz()}</div>}
+{!showLanding && !form.tripType && <div>{renderTripTypeChoice()}</div>}
+{!previewResult && !loadingStage && !showLanding && form.tripType && step === 0 && <div><ProgressBar step={0} />{renderVibeQuiz()}</div>}
 {!previewResult && !loadingStage && !showLanding && step === 1 && <div><ProgressBar step={1} />{renderTripBasics()}</div>}
 {!previewResult && !loadingStage && !showLanding && step === 2 && <div><ProgressBar step={2} />{renderPreferences()}</div>}
 {!previewResult && !loadingStage && !showLanding && step === 3 && <div><ProgressBar step={3} />{renderFinalDetails()}</div>}
