@@ -731,9 +731,17 @@ ${form.tripType === "holiday" ? `- Pace: Not applicable for a holiday — settle
 - Travel Dates: ${effectiveStartDate || "Flexible"}
 - Departure location: ${form.departure || "UK"}
 
+Day 1 has already been planned and shown to the traveller -- here it is, for context only, do not repeat or re-describe it:
+"""
+${previewResult || "Not available"}
+"""
+
 Respond with EXACTLY these sections, each kept concise:
 
-${effectiveDuration >= 60 ? `Before the sections below, if the stated duration seems unusually long for genuinely exploring just this destination (e.g. two or more months confined to one small-to-medium country), open with one honest sentence about it -- suggest how to make that much time work well there (much slower pace, remote regions, volunteering, real language immersion), or note that many travellers doing a trip this long would extend into neighbouring countries -- rather than silently planning as if the scope were normal. Skip this note entirely if the duration is genuinely reasonable for the destination given.\n\n` : ""}## Top Picks
+${effectiveDuration >= 60 ? `Before the sections below, if the stated duration seems unusually long for genuinely exploring just this destination (e.g. two or more months confined to one small-to-medium country), open with one honest sentence about it -- suggest how to make that much time work well there (much slower pace, remote regions, volunteering, real language immersion), or note that many travellers doing a trip this long would extend into neighbouring countries -- rather than silently planning as if the scope were normal. Skip this note entirely if the duration is genuinely reasonable for the destination given.\n\n` : ""}${form.tripType === "backpacking" ? `## Route Overview
+2-3 sentences on the overall geographic flow (A → B → C), tailored to their pace and interests.
+
+` : ""}## Top Picks
 3 standout highlights, one line each.
 
 ## Accommodation
@@ -743,7 +751,7 @@ ${isLong
   ? `## Trip Breakdown
 This is a longer trip (${effectiveDuration} days). Structure as phases covering roughly 2 weeks each — for a 90 day trip this means about 6 phases total, not one per week. Use the exact format "### Phase N" (e.g. "### Phase 1") as a header immediately before each phase's content — this exact format is required so the app can display each phase separately. Keep each phase to 4-5 sentences maximum, no exceptions. Pace note: ${form.tripType === "holiday" ? "settle in, minimal moving between locations" : form.pace === "fast_packed" ? "move to a new location every 2-3 days within each phase" : form.pace === "slow_deep" ? "settle into 1-2 base locations per phase, minimal moving" : "a balanced mix of settling in and moving on"}.`
   : `## Day-by-Day Breakdown
-Days 2 onwards. Use the exact format "### Day N" (e.g. "### Day 2") as a header immediately before each day's content — this exact format is required so the app can display each day separately. Each day: Morning/Afternoon/Evening as short bullets. One restaurant tip per day. Keep each day tight — no more than 5 bullet points total. Pace note: ${form.tripType === "holiday" ? "settled and relaxed, minimal moving between locations" : form.pace === "fast_packed" ? "change location every 2-3 days, don't linger" : form.pace === "slow_deep" ? "stay in 1-2 places for most of the trip, deep not wide" : "moderate movement between locations"}.`
+Days 2 onwards, continuing naturally from what actually happened on Day 1 above -- do not repeat arrival, check-in, or first-meal content, that's already covered. Use the exact format "### Day N" (e.g. "### Day 2") as a header immediately before each day's content — this exact format is required so the app can display each day separately. Each day: Morning/Afternoon/Evening as short bullets. One restaurant tip per day. Keep each day tight — no more than 5 bullet points total. Pace note: ${form.tripType === "holiday" ? "settled and relaxed, minimal moving between locations" : form.pace === "fast_packed" ? "change location every 2-3 days, don't linger" : form.pace === "slow_deep" ? "stay in 1-2 places for most of the trip, deep not wide" : "moderate movement between locations"}.`
 }
 
 ## Season & Timing
@@ -1125,7 +1133,8 @@ const renderVibeQuiz = () => {
       <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: "16px", padding: "24px", marginBottom: "20px" }}>
         <OutputSection emoji="📋" title="What You'll Get" last>
           {[
-            `Full day-by-day plan for all ${effectiveDuration} days`,
+            ...(form.tripType === "backpacking" ? ["A full route overview — how it all connects"] : []),
+            Number(effectiveDuration) > 20 ? `Your full trip broken into phases across all ${effectiveDuration} days` : `Full day-by-day plan for all ${effectiveDuration} days`,
             "Specific accommodation picks for each stop",
             "Top Picks — the can't-miss highlights",
             "Season & timing advice",
