@@ -891,6 +891,38 @@ const renderLanding = () => (
     }}>
       Get Started →
     </button>
+
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px", maxWidth: "340px", margin: "44px auto 0" }}>
+      {[
+        {
+          title: "Answer a quiz",
+          desc: "Your style, budget & pace",
+          icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 20 L4.8 16.5 L15.5 5.8 A1.5 1.5 0 0 1 17.6 5.8 L18.2 6.4 A1.5 1.5 0 0 1 18.2 8.5 L7.5 19.2 Z" stroke={C.drift} strokeWidth="1.4"/><path d="M13.5 7.8 L16.2 10.5" stroke={C.drift} strokeWidth="1.4"/></svg>,
+        },
+        {
+          title: "See a sample",
+          desc: "Free, no obligation",
+          icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M2 12 C5 6, 19 6, 22 12 C19 18, 5 18, 2 12 Z" stroke={C.drift} strokeWidth="1.4"/><circle cx="12" cy="12" r="3" stroke={C.drift} strokeWidth="1.4"/></svg>,
+        },
+        {
+          title: "Unlock it all",
+          desc: "One-time, from £1.99",
+          icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke={C.drift} strokeWidth="1.4"/><ellipse cx="12" cy="12" rx="4" ry="9" stroke={C.drift} strokeWidth="1.4"/><path d="M3 12 H21" stroke={C.drift} strokeWidth="1.4"/><path d="M4.5 7.5 H19.5" stroke={C.drift} strokeWidth="1.2"/><path d="M4.5 16.5 H19.5" stroke={C.drift} strokeWidth="1.2"/></svg>,
+        },
+      ].map((step, i, arr) => (
+        <React.Fragment key={step.title}>
+          <div style={{ flex: 1 }}>
+            <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: C.driftLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px" }}>
+              {step.icon}
+            </div>
+            <div style={{ fontSize: "12.5px", fontWeight: 600, color: C.text, fontFamily: font.body, marginBottom: "3px" }}>{step.title}</div>
+            <div style={{ fontSize: "11px", color: C.muted, fontFamily: font.body, lineHeight: 1.4 }}>{step.desc}</div>
+          </div>
+          {i < arr.length - 1 && <div style={{ color: C.border, fontSize: "16px", paddingTop: "12px" }}>→</div>}
+        </React.Fragment>
+      ))}
+    </div>
+
     <div style={{ marginTop: "40px", fontSize: "11px", color: C.muted, fontFamily: font.body }}>
       Just need a place to book?
       <div style={{ marginTop: "8px", display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" }}>
@@ -900,6 +932,10 @@ const renderLanding = () => (
         <span style={{ color: C.border }}>·</span>
         <a href="https://www.skyscanner.net" target="_blank" rel="noopener noreferrer" style={{ color: C.driftMid, fontWeight: 600, textDecoration: "none" }}>Skyscanner</a>
       </div>
+    </div>
+
+    <div style={{ fontSize: "12.5px", color: C.muted, fontStyle: "italic", maxWidth: "300px", margin: "36px auto 0", lineHeight: 1.6, paddingTop: "20px", borderTop: `1px solid ${C.border}` }}>
+      Built by a solo traveller who got tired of spending hours planning trips. Now it takes three minutes.
     </div>
   </div>
 );
