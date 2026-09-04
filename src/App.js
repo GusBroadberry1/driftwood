@@ -875,12 +875,12 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
   };
 
 const renderLanding = () => (
-  <div style={{ textAlign: "center", padding: "100px 20px 40px" }}>
+  <div style={{ textAlign: "center", padding: "56px 20px 40px" }}>
     <DriftwoodLogo size="large" />
-    <h1 style={{ fontFamily: font.display, fontSize: "32px", color: C.text, margin: "40px 0 12px", fontWeight: 600 }}>
+    <h1 style={{ fontFamily: font.display, fontSize: "32px", color: C.text, margin: "28px 0 10px", fontWeight: 600 }}>
       Plan less. Travel more.
     </h1>
-    <p style={{ color: C.muted, fontSize: "14px", fontFamily: font.body, maxWidth: "360px", margin: "0 auto 32px", lineHeight: 1.6 }}>
+    <p style={{ color: C.muted, fontSize: "14px", fontFamily: font.body, maxWidth: "360px", margin: "0 auto 26px", lineHeight: 1.6 }}>
       Fill in a quick 2-3 minute form and get a full, personalised travel itinerary — built just for you.
     </p>
     <button onClick={() => setShowLanding(false)} style={{
@@ -892,7 +892,7 @@ const renderLanding = () => (
       Get Started →
     </button>
 
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px", maxWidth: "340px", margin: "44px auto 0" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "10px", maxWidth: "340px", margin: "32px auto 0" }}>
       {[
         {
           title: "Answer a quiz",
@@ -923,7 +923,7 @@ const renderLanding = () => (
       ))}
     </div>
 
-    <div style={{ marginTop: "40px", fontSize: "11px", color: C.muted, fontFamily: font.body }}>
+    <div style={{ marginTop: "28px", fontSize: "11px", color: C.muted, fontFamily: font.body }}>
       Just need a place to book?
       <div style={{ marginTop: "8px", display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" }}>
         <a href={CJ_BOOKING_LINK_BASE} target="_blank" rel="noopener noreferrer sponsored" style={{ color: C.driftMid, fontWeight: 600, textDecoration: "none" }}>Booking.com</a>
@@ -934,7 +934,7 @@ const renderLanding = () => (
       </div>
     </div>
 
-    <div style={{ fontSize: "12.5px", color: C.muted, fontStyle: "italic", maxWidth: "300px", margin: "36px auto 0", lineHeight: 1.6, paddingTop: "20px", borderTop: `1px solid ${C.border}` }}>
+    <div style={{ fontSize: "12.5px", color: C.muted, fontStyle: "italic", maxWidth: "300px", margin: "26px auto 0", lineHeight: 1.6, paddingTop: "16px", borderTop: `1px solid ${C.border}` }}>
       Built by a solo traveller who got tired of spending hours planning trips. Now it takes three minutes.
     </div>
   </div>
