@@ -875,7 +875,7 @@ Write like a well-travelled friend. Be concise and specific — bullet points, n
   };
 
 const renderLanding = () => (
-  <div style={{ textAlign: "center", padding: "56px 20px 40px" }}>
+  <div style={{ textAlign: "center", padding: "20px 20px 40px" }}>
     <DriftwoodLogo size="large" />
     <h1 style={{ fontFamily: font.display, fontSize: "32px", color: C.text, margin: "28px 0 10px", fontWeight: 600 }}>
       Plan less. Travel more.
